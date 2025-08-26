@@ -9,5 +9,7 @@ try:
     from . import gui
     from . import parsers
     from . import utils
+    from . import topspin_interface
 except ImportError:
+
     pass  # Handle gracefully if modules don't exist yet

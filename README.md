@@ -23,13 +23,13 @@ git clone https://github.com/EricHughesABC/simpleNMRbrukerTools.git
 ### 2. Install the Package
 
 1. **Open a terminal** and activate the Bruker/TopSpin Python3 environment
-2. **Navigate** to the `simpleNMRbrukerTools` directory:
+2. **Navigate** to the top `simpleNMRbrukerTools` directory:
    ```bash
    cd simpleNMRbrukerTools
    ```
 3. **Install** using pip:
    ```bash
-   pip install simpleNMRBrukerTools
+   pip install simpleNMRbrukerTools
    ```
 
 ### 3. Setup TopSpin Integration
