@@ -29,7 +29,7 @@ git clone https://github.com/EricHughesABC/simpleNMRbrukerTools.git
    ```
 3. **Install** using pip:
    ```bash
-   pip install simpleNMRBrukerTools
+   pip install simpleNMRbrukerTools
    ```
 
 ### 3. Setup TopSpin Integration
@@ -107,6 +107,7 @@ This project falls under the MIT license.
 ## Contributing
 
 If you are interested in helping please get in touch. Fork the project and submit an update. If you have comments or suggestions get in touch via email simpleNMR@gmail.com
+
 
 
 
