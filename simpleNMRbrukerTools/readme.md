@@ -17,7 +17,7 @@ Before installing simpleNMRbrukerTools, ensure you have:
 Clone or download the `simpleNMRbrukerTools` repository from GitHub:
 
 ```bash
-git clone https://github.com/erichughesABC/simpleNMRbrukerTools.git
+git clone https://github.com/EricHughesABC/simpleNMRbrukerTools.git
 ```
 
 ### 2. Install the Package
@@ -78,7 +78,7 @@ After successful configuration, you should see:
 ## Support
 
 For issues and questions:
-- Check the [Issues](https://github.com/your-username/simpleNMRbrukerTools/issues) page
+- Check the [Issues](https://github.com/EricHughesABC/simpleNMRbrukerTools/issues) page
 - Refer to the Bruker Python3/Jupyter tutorial documentation
 
 ## License
@@ -88,3 +88,4 @@ For issues and questions:
 ## Contributing
 
 [Add contribution guidelines here]
+
