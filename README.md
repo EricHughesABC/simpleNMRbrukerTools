@@ -67,6 +67,24 @@ After successful configuration, you should see:
 
 ![simpleNMR installed in Topspin](simpleNMRbrukerTools/docs/images/simpleNMRinstalledFlowbar.png "simpleNMR installed in Topspin")
 
+
+
+## Example Bruker Data Set (already peak picked)
+
+Due to GitHub's 100MB file size limit, the following files are hosted on Google Drive:
+
+| File | Description | Size | Link |
+|------|-------------|------|------|
+| `exam_CMCse_1.zip` | Bruker Topspin dataset | 60MB | [Download](https://drive.google.com/uc?export=download&id=1Qdi8NzqOBgqj5Cu3x1Hpk71WnJpAtZz2) |
+
+
+
+### Usage
+```bash
+# Download the files to your project directory
+wget "https://drive.google.com/uc?export=download&id=1Qdi8NzqOBgqj5Cu3x1Hpk71WnJpAtZz2" -O exam_CMCse_1.zip
+```
+
 ## Troubleshooting
 
 ### Common Issues
