@@ -1,0 +1,2390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .plot-container {
+            width: 1000px;
+            height: 600px;
+            margin: 0 auto;
+            overflow: hidden; /* Prevent scrollbars from appearing */
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            display: inline-block;
+            max-width: 800px; /* Set max-width for the tooltip */
+        }
+
+        /* Style for the SVG border */
+        svg {
+            position: relative; /* Set position relative to make it a positioning context */
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .container {
+            display: flex; /* Use flexbox */
+            justify-content: center; /* Center the content horizontally */
+            margin: 0 auto; /* Set the left and right margins to auto to center the container */
+        }
+
+        .group {
+            border: 1px solid black;
+            border-radius: 10px; /* Adjust the value to change the roundness of the corners */
+            display: block;
+            margin-right: 10px; /* Add some space between the groups */
+            padding: 10px; /* Add padding inside the border */
+            padding: 10px; /* Add padding inside the border */
+        }
+
+        .group:last-child {
+            margin-right: 0; /* Remove margin from the last group */
+        }
+
+        .color-container {
+            position: relative;
+            display: inline-block;
+            
+        }
+
+        .color-box {
+            width: 100px;
+            height: 50px;
+            border-radius: 7px;
+        }
+
+        .striped-rectangle {
+            width: 100px;
+            height: 50px;
+            background: repeating-linear-gradient(90deg, #ccc, #ccc 10px, #fff 10px, #fff 20px);
+        }
+
+        .color-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: black; /* Adjust text color as needed */
+        }
+
+        .orange { background-color: #FFA500; }
+        .green { background-color: #98FB98; }
+        .yellow { background-color: yellow; }
+        .cyan { background-color: #00FFFF; }
+        .grey { background-color: #808080; }
+        .blue { background-color: #ADD8E6; }
+        .red { background-color: #FF0000; }
+
+        .buttontooltip {
+            visibility: hidden;
+            width: 400px; /* Adjust width as needed */
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the button */
+            left: 50%;
+            margin-left: -60px; /* Center the tooltip */
+            opacity: 0; /* Hide by default */
+            transition: opacity 0.3s; /* Smooth transition */
+        }
+
+        .action-button {
+            position: relative; /* Needed for absolute positioning of tooltip */
+        }
+
+        .action-button:hover .buttontooltip {
+            visibility: visible;
+            opacity: 1; /* Show the tooltip on hover */
+        }
+
+       /* Normal button styles */
+       button.normal {
+            background-color: #ADD8E6;
+            color: black;
+            border: 2px solid #ADD8E6; 
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        /* Sunken (clicked) button styles */
+        button.sunken {
+            background-color: #dae3e6;
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+            transform: translateY(2px);
+        }
+    </style>
+
+    <title>dummy_title</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <br>
+    <br>
+
+     <!-- SVG container with background molecule image -->
+
+     <div class="plot-container" id="plot-container">
+    
+    <?xml version='1.0' encoding='iso-8859-1'?>
+<svg class="center" version='1.1' baseProfile='full'
+              xmlns='http://www.w3.org/2000/svg'
+                      xmlns:rdkit='http://www.rdkit.org/xml'
+                      xmlns:xlink='http://www.w3.org/1999/xlink'
+                  xml:space='preserve'
+width=1000 height=600 viewBox='0 0 1000 600'>
+<!-- END OF HEADER -->
+<g transform='translate(0, 0)'>
+<rect style='opacity:1.0;fill:none;stroke:none' width='1000.0' height='600.0' x='0.0' y='0.0'> </rect>
+<path class='bond-0 atom-10 atom-6' d='M 92.6,509.8 L 202.9,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-1 atom-8 atom-6' d='M 313.1,509.8 L 202.9,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-6 atom-7' d='M 202.9,378.4 L 54.3,292.6' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-3 atom-6 atom-5' d='M 202.9,378.4 L 351.4,292.6' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-4 atom-7 atom-11' d='M 54.3,292.6 L 54.3,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-5 atom-12 atom-3' d='M 500.0,35.3 L 351.4,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-6 atom-5 atom-1' d='M 351.4,292.6 L 500.0,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-7 atom-5 atom-3' d='M 351.4,292.6 L 351.4,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-8 atom-4 atom-3' d='M 202.9,35.3 L 351.4,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-8 atom-4 atom-3' d='M 202.9,65.0 L 325.7,135.9' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-9 atom-4 atom-11' d='M 202.9,35.3 L 54.3,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-10 atom-1 atom-2' d='M 500.0,378.4 L 648.6,292.6' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-10 atom-1 atom-2' d='M 500.0,348.7 L 635.7,270.3' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-11 atom-9 atom-0' d='M 945.7,292.6 L 797.1,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-12 atom-2 atom-0' d='M 648.6,292.6 L 797.1,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 784.3,371.0 L 784.3,450.5' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 784.3,450.5 L 784.3,530.0' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 810.0,371.0 L 810.0,450.5' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 810.0,450.5 L 810.0,530.0' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path d='M 804.6,374.1 L 797.1,378.4 L 789.7,374.1' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 492.6,374.1 L 500.0,378.4 L 507.4,374.1' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 641.1,296.9 L 648.6,292.6 L 656.0,296.9' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 210.3,39.6 L 202.9,35.3 L 195.4,39.6' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 61.7,296.9 L 54.3,292.6 L 54.3,284.0' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 54.3,129.6 L 54.3,121.1 L 61.7,116.8' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path class='atom-13' d='M 784.1 550.0
+Q 784.1 543.2, 787.5 539.4
+Q 790.9 535.6, 797.1 535.6
+Q 803.4 535.6, 806.8 539.4
+Q 810.1 543.2, 810.1 550.0
+Q 810.1 556.9, 806.7 560.8
+Q 803.3 564.7, 797.1 564.7
+Q 790.9 564.7, 787.5 560.8
+Q 784.1 557.0, 784.1 550.0
+M 797.1 561.5
+Q 801.5 561.5, 803.8 558.6
+Q 806.1 555.7, 806.1 550.0
+Q 806.1 544.5, 803.8 541.7
+Q 801.5 538.8, 797.1 538.8
+Q 792.8 538.8, 790.5 541.6
+Q 788.1 544.4, 788.1 550.0
+Q 788.1 555.8, 790.5 558.6
+Q 792.8 561.5, 797.1 561.5
+' fill='#FF0000'/>
+<path  d='M 92.6,509.8 L 202.9,378.4' class='bond-selector bond-0 atom-10 atom-6' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 313.1,509.8 L 202.9,378.4' class='bond-selector bond-1 atom-8 atom-6' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,378.4 L 54.3,292.6' class='bond-selector bond-2 atom-6 atom-7' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,378.4 L 351.4,292.6' class='bond-selector bond-3 atom-6 atom-5' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 54.3,292.6 L 54.3,121.1' class='bond-selector bond-4 atom-7 atom-11' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 500.0,35.3 L 351.4,121.1' class='bond-selector bond-5 atom-12 atom-3' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 351.4,292.6 L 500.0,378.4' class='bond-selector bond-6 atom-5 atom-1' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 351.4,292.6 L 351.4,121.1' class='bond-selector bond-7 atom-5 atom-3' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,35.3 L 351.4,121.1' class='bond-selector bond-8 atom-4 atom-3' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,35.3 L 54.3,121.1' class='bond-selector bond-9 atom-4 atom-11' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 500.0,378.4 L 648.6,292.6' class='bond-selector bond-10 atom-1 atom-2' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 945.7,292.6 L 797.1,378.4' class='bond-selector bond-11 atom-9 atom-0' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 648.6,292.6 L 797.1,378.4' class='bond-selector bond-12 atom-2 atom-0' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 797.1,378.4 L 797.1,550.0' class='bond-selector bond-13 atom-0 atom-13' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='797.1' cy='378.4' r='22.9' class='atom-selector atom-0' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='500.0' cy='378.4' r='22.9' class='atom-selector atom-1' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='648.6' cy='292.6' r='22.9' class='atom-selector atom-2' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='351.4' cy='121.1' r='22.9' class='atom-selector atom-3' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='202.9' cy='35.3' r='22.9' class='atom-selector atom-4' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='351.4' cy='292.6' r='22.9' class='atom-selector atom-5' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='202.9' cy='378.4' r='22.9' class='atom-selector atom-6' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='54.3' cy='292.6' r='22.9' class='atom-selector atom-7' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='313.1' cy='509.8' r='22.9' class='atom-selector atom-8' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='945.7' cy='292.6' r='22.9' class='atom-selector atom-9' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='92.6' cy='509.8' r='22.9' class='atom-selector atom-10' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='54.3' cy='121.1' r='22.9' class='atom-selector atom-11' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='500.0' cy='35.3' r='22.9' class='atom-selector atom-12' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='797.1' cy='550.0' r='22.9' class='atom-selector atom-13' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+</g>
+</svg>
+ 
+    
+    </div>
+
+    <!-- Tooltip for displaying node information -->
+    <div id="tooltip" class="tooltip">Tooltip content</div>
+    <br>
+  
+    <div class="container">
+        <div class="group">
+            <button style="border: 2px solid orange" class="color-container color-box action-button orange" >
+                -C-<sub></sub>
+            </button>
+            <button style="border: 2px solid #98FB98" class="color-container color-box action-button green" >
+                -CH<sub></sub>
+            </button>
+            <button style="border: 2px solid yellow" class="color-container color-box action-button yellow" >
+                -CH<sub>2</sub>
+            </button>
+            <button style="border: 2px solid cyan" class="color-container color-box action-button cyan" >
+                -CH<sub>3</sub>
+            </button>
+        </div>
+        <div class="group">
+            <!-- <button id="sunkenButton" class="normal color-container color-box action-button">Click Me</button> -->
+            <button style="border: 2px solid grey" class="color-container color-box action-button grey" id="hmbcButton">
+                HMBC
+                <span  class="buttontooltip">Press to display HMBC links</span>
+            </button>
+            <button id="sunkenButton" class="normal color-container color-box action-button blue" >
+                COSY
+                <span  class="buttontooltip">Press to hide COSY links</span>
+            </button>
+        </div>
+        <div class="group">
+            <button id="infoButton" class="color-container color-box action-button white">
+                INFO
+                <span class="buttontooltip" id="info_results">Minimization Results</span>
+            </button>   
+            <button class="color-container color-box action-button white"  onclick="updateMovedAtoms()">
+                Update
+                <span class="buttontooltip">Apply the changes updating the ppm values and atom numbers</span>
+            </button>
+            <button class="color-container color-box action-button white" onclick="exportToMnova()">
+                Export
+                <span class="buttontooltip">Export information as JSON for use in assignment in MNOVA</span>
+            </button>
+            <button class="color-container color-box action-button white" onclick="window.open('http://simplenmr.pythonanywhere.com/documentation/index.html', '_blank')">
+                Help
+                <span class="buttontooltip">simpleNMR help pages</span>
+            </button>
+            
+   
+        </div>
+    </div>   
+
+    <script>
+
+    // Select the SVG element and add an id to it
+    d3.select("svg").attr("id", "svg-image");
+        
+    // Select the first <g> element and add an id to it
+    d3.select("#svg-image").select("g").attr("id", "molimage")
+
+    const svgElement = document.querySelector('svg.center');
+
+    // Update the width and height attributes
+    svgElement.setAttribute('width', '1000');
+    svgElement.setAttribute('height', '600');
+
+    // Update the viewBox attribute
+    svgElement.setAttribute('viewBox', '0 0 1000 600');
+
+    
+    // smiles string
+    const smilesString = "CC(=O)/C=C/C1C(C)=CCCC1(C)C";
+    // molfile
+    const molfile = `
+  CDK    10/13/08,15:9
+
+ 14 14  0  0  0  0  0  0  0  0999 V2000
+    3.8971   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2990   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.5981   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.5000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2990    2.2500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2990   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.5981   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.3349   -1.8991    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    5.1962   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.2632   -1.8991    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.5981    1.5000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2990    2.2500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.8971   -2.2500    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+ 11  7  1  0  0  0  0 
+  9  7  1  0  0  0  0 
+  7  8  1  0  0  0  0 
+  7  6  1  0  0  0  0 
+  8 12  1  0  0  0  0 
+ 13  4  1  0  0  0  0 
+  6  2  1  0  0  0  0 
+  6  4  1  0  0  0  0 
+  5  4  2  0  0  0  0 
+  5 12  1  0  0  0  0 
+  2  3  2  0  0  0  0 
+ 10  1  1  0  0  0  0 
+  3  1  1  0  0  0  0 
+  1 14  2  0  0  0  0 
+M  END
+$$$$
+`;
+    // working directory
+    const workingDirectory = `/opt/topspin4.5.0/examdata/exam_CMCse_1`;
+    // working filename
+    const workingFilename = `exam_CMCse_1`;
+    // data from
+    const dataFrom = `nmrshiftdb2`;
+    // oldjsondata
+    const oldjsondata = {
+    "C13_1D_0": {
+        "class": "",
+        "datafilename": "/opt/topspin4.5.0/examdata/exam_CMCse_1/5",
+        "datatype": "nmrspectrum",
+        "experiment": "C13_1D",
+        "experimenttype": "1D",
+        "filename": "C13_1D_0",
+        "integrals": {
+            "count": 0,
+            "data": {},
+            "datatype": "integrals",
+            "normValue": 1
+        },
+        "intrument": "Avance",
+        "multiplets": {
+            "count": 0,
+            "data": {},
+            "datatype": "multiplets",
+            "normValue": 1
+        },
+        "nucleus": "13C",
+        "origin": "Bruker XWIN-NMR",
+        "peaks": {
+            "count": 13,
+            "data": {
+                "0": {
+                    "annotation": "",
+                    "delta1": 198.34814,
+                    "delta2": 0,
+                    "intensity": 42.31945,
+                    "type": 0
+                },
+                "1": {
+                    "annotation": "",
+                    "delta1": 148.95233,
+                    "delta2": 0,
+                    "intensity": 116.0688,
+                    "type": 0
+                },
+                "10": {
+                    "annotation": "",
+                    "delta1": 26.750731,
+                    "delta2": 0,
+                    "intensity": 191.3534,
+                    "type": 0
+                },
+                "11": {
+                    "annotation": "",
+                    "delta1": 22.965504,
+                    "delta2": 0,
+                    "intensity": 200.0,
+                    "type": 0
+                },
+                "12": {
+                    "annotation": "",
+                    "delta1": 22.715037,
+                    "delta2": 0,
+                    "intensity": 188.4693,
+                    "type": 0
+                },
+                "2": {
+                    "annotation": "",
+                    "delta1": 132.296723,
+                    "delta2": 0,
+                    "intensity": 184.4766,
+                    "type": 0
+                },
+                "3": {
+                    "annotation": "",
+                    "delta1": 131.866118,
+                    "delta2": 0,
+                    "intensity": 89.51861,
+                    "type": 0
+                },
+                "4": {
+                    "annotation": "",
+                    "delta1": 122.618058,
+                    "delta2": 0,
+                    "intensity": 182.6087,
+                    "type": 0
+                },
+                "5": {
+                    "annotation": "",
+                    "delta1": 54.258628,
+                    "delta2": 0,
+                    "intensity": 169.7079,
+                    "type": 0
+                },
+                "6": {
+                    "annotation": "",
+                    "delta1": 32.463689,
+                    "delta2": 0,
+                    "intensity": 136.5927,
+                    "type": 0
+                },
+                "7": {
+                    "annotation": "",
+                    "delta1": 31.178288,
+                    "delta2": 0,
+                    "intensity": 159.9933,
+                    "type": 0
+                },
+                "8": {
+                    "annotation": "",
+                    "delta1": 27.744082,
+                    "delta2": 0,
+                    "intensity": 172.0736,
+                    "type": 0
+                },
+                "9": {
+                    "annotation": "",
+                    "delta1": 26.886047,
+                    "delta2": 0,
+                    "intensity": 162.611,
+                    "type": 0
+                }
+            },
+            "datatype": "peaks"
+        },
+        "probe": "36",
+        "pulsesequence": "zgpg30",
+        "specfrequency": 100.612769,
+        "spectype": "",
+        "subtype": "13C",
+        "temperature": "300",
+        "type": "1D"
+    },
+    "HSQC_0": {
+        "class": "",
+        "datafilename": "/opt/topspin4.5.0/examdata/exam_CMCse_1/3",
+        "datatype": "nmrspectrum",
+        "experiment": "HSQC",
+        "experimenttype": "2D-HSQC",
+        "filename": "HSQC_0",
+        "integrals": {
+            "count": 0,
+            "data": {},
+            "datatype": "integrals",
+            "normValue": 1
+        },
+        "intrument": "Avance",
+        "multiplets": {
+            "count": 0,
+            "data": {},
+            "datatype": "multiplets",
+            "normValue": 1
+        },
+        "nucleus": "['1H', '13C']",
+        "origin": "Bruker XWIN-NMR",
+        "peaks": {
+            "count": 11,
+            "data": {
+                "0": {
+                    "annotation": "",
+                    "delta1": 148.99583219233108,
+                    "delta2": 6.592473382380121,
+                    "intensity": 5610131.5,
+                    "type": 0
+                },
+                "1": {
+                    "annotation": "",
+                    "delta1": 132.33291435086142,
+                    "delta2": 6.027089025209533,
+                    "intensity": 5352437.875,
+                    "type": 0
+                },
+                "10": {
+                    "annotation": "",
+                    "delta1": 27.873509157336468,
+                    "delta2": 0.8309217010824879,
+                    "intensity": 30003776.0625,
+                    "type": 0
+                },
+                "2": {
+                    "annotation": "",
+                    "delta1": 122.63512604644679,
+                    "delta2": 5.479584689763677,
+                    "intensity": 6347967.25,
+                    "type": 0
+                },
+                "3": {
+                    "annotation": "",
+                    "delta1": 54.237463055499504,
+                    "delta2": 2.261870301427219,
+                    "intensity": 7230252.1875,
+                    "type": 0
+                },
+                "4": {
+                    "annotation": "",
+                    "delta1": 26.941404253328784,
+                    "delta2": 2.2299501828561485,
+                    "intensity": 16823681.5625,
+                    "type": 0
+                },
+                "5": {
+                    "annotation": "",
+                    "delta1": 22.994086133708777,
+                    "delta2": 2.0261726214309204,
+                    "intensity": -17783003.375,
+                    "type": 0
+                },
+                "6": {
+                    "annotation": "",
+                    "delta1": 22.760247969637152,
+                    "delta2": 1.5454806012064468,
+                    "intensity": 21268830.8125,
+                    "type": 0
+                },
+                "7": {
+                    "annotation": "",
+                    "delta1": 31.17842187621528,
+                    "delta2": 1.4361081278902983,
+                    "intensity": -6578480.4375,
+                    "type": 0
+                },
+                "8": {
+                    "annotation": "",
+                    "delta1": 31.17842187621528,
+                    "delta2": 1.2054748689410284,
+                    "intensity": -7386156.1875,
+                    "type": 0
+                },
+                "9": {
+                    "annotation": "",
+                    "delta1": 26.75108596979272,
+                    "delta2": 0.9062460479228267,
+                    "intensity": 27661067.25,
+                    "type": 0
+                }
+            },
+            "datatype": "peaks"
+        },
+        "probe": "36",
+        "pulsesequence": "hsqcedetgpsp.3",
+        "specfrequency": "[100.612769, 400.13]",
+        "spectype": "",
+        "subtype": "13C1H, HSQC-EDITED",
+        "temperature": "300",
+        "type": "2D"
+    },
+    "MNOVAcalcMethod": {
+        "count": 1,
+        "data": {
+            "0": "NMRSHIFTDB2 Predict"
+        },
+        "datatype": "MNOVAcalcMethod"
+    },
+    "allAtomsInfo": {
+        "count": 14,
+        "data": {
+            "0": {
+                "atomNumber": "1",
+                "atom_idx": 0,
+                "id": 0,
+                "numProtons": 0,
+                "symbol": "C"
+            },
+            "1": {
+                "atomNumber": "2",
+                "atom_idx": 1,
+                "id": 1,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "10": {
+                "atomNumber": "11",
+                "atom_idx": 10,
+                "id": 10,
+                "numProtons": 3,
+                "symbol": "C"
+            },
+            "11": {
+                "atomNumber": "12",
+                "atom_idx": 11,
+                "id": 11,
+                "numProtons": 2,
+                "symbol": "C"
+            },
+            "12": {
+                "atomNumber": "13",
+                "atom_idx": 12,
+                "id": 12,
+                "numProtons": 3,
+                "symbol": "C"
+            },
+            "13": {
+                "atomNumber": "14",
+                "atom_idx": 13,
+                "id": 13,
+                "numProtons": 0,
+                "symbol": "O"
+            },
+            "2": {
+                "atomNumber": "3",
+                "atom_idx": 2,
+                "id": 2,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "3": {
+                "atomNumber": "4",
+                "atom_idx": 3,
+                "id": 3,
+                "numProtons": 0,
+                "symbol": "C"
+            },
+            "4": {
+                "atomNumber": "5",
+                "atom_idx": 4,
+                "id": 4,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "5": {
+                "atomNumber": "6",
+                "atom_idx": 5,
+                "id": 5,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "6": {
+                "atomNumber": "7",
+                "atom_idx": 6,
+                "id": 6,
+                "numProtons": 0,
+                "symbol": "C"
+            },
+            "7": {
+                "atomNumber": "8",
+                "atom_idx": 7,
+                "id": 7,
+                "numProtons": 2,
+                "symbol": "C"
+            },
+            "8": {
+                "atomNumber": "9",
+                "atom_idx": 8,
+                "id": 8,
+                "numProtons": 3,
+                "symbol": "C"
+            },
+            "9": {
+                "atomNumber": "10",
+                "atom_idx": 9,
+                "id": 9,
+                "numProtons": 3,
+                "symbol": "C"
+            }
+        },
+        "datatype": "allAtomsInfo"
+    },
+    "c13predictions": {
+        "count": 0,
+        "data": {},
+        "datatype": "c13predictions"
+    },
+    "carbonAtomsInfo": {
+        "count": 13,
+        "data": {
+            "0": {
+                "atomNumber": "1",
+                "atom_idx": 0,
+                "id": 0,
+                "numProtons": 0,
+                "symbol": "C"
+            },
+            "1": {
+                "atomNumber": "2",
+                "atom_idx": 1,
+                "id": 1,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "10": {
+                "atomNumber": "11",
+                "atom_idx": 10,
+                "id": 10,
+                "numProtons": 3,
+                "symbol": "C"
+            },
+            "11": {
+                "atomNumber": "12",
+                "atom_idx": 11,
+                "id": 11,
+                "numProtons": 2,
+                "symbol": "C"
+            },
+            "12": {
+                "atomNumber": "13",
+                "atom_idx": 12,
+                "id": 12,
+                "numProtons": 3,
+                "symbol": "C"
+            },
+            "2": {
+                "atomNumber": "3",
+                "atom_idx": 2,
+                "id": 2,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "3": {
+                "atomNumber": "4",
+                "atom_idx": 3,
+                "id": 3,
+                "numProtons": 0,
+                "symbol": "C"
+            },
+            "4": {
+                "atomNumber": "5",
+                "atom_idx": 4,
+                "id": 4,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "5": {
+                "atomNumber": "6",
+                "atom_idx": 5,
+                "id": 5,
+                "numProtons": 1,
+                "symbol": "C"
+            },
+            "6": {
+                "atomNumber": "7",
+                "atom_idx": 6,
+                "id": 6,
+                "numProtons": 0,
+                "symbol": "C"
+            },
+            "7": {
+                "atomNumber": "8",
+                "atom_idx": 7,
+                "id": 7,
+                "numProtons": 2,
+                "symbol": "C"
+            },
+            "8": {
+                "atomNumber": "9",
+                "atom_idx": 8,
+                "id": 8,
+                "numProtons": 3,
+                "symbol": "C"
+            },
+            "9": {
+                "atomNumber": "10",
+                "atom_idx": 9,
+                "id": 9,
+                "numProtons": 3,
+                "symbol": "C"
+            }
+        },
+        "datatype": "carbonAtomsInfo"
+    },
+    "carbonCalcPositionsMethod": {
+        "count": 1,
+        "data": {
+            "0": "Calculated Positions"
+        },
+        "datatype": "carbonCalcPositionsMethod"
+    },
+    "chosenSpectra": {
+        "count": 2,
+        "data": {
+            "0": "[1H, 13C] 2D hsqcedetgpsp.3 HSQC_0 HSQC",
+            "1": "13C 1D zgpg30 C13_1D_0 C13_1D"
+        },
+        "datatype": "chosenSpectra"
+    },
+    "coolingRate": {
+        "count": 1,
+        "data": {
+            "0": 0.999
+        },
+        "datatype": "coolingRate"
+    },
+    "endingTemperature": {
+        "count": 1,
+        "data": {
+            "0": 0.1
+        },
+        "datatype": "endingTemperature"
+    },
+    "exptIdentifiers": {
+        "count": 5,
+        "data": {
+            "0": "H1_1D",
+            "1": "HMBC",
+            "2": "HSQC",
+            "3": "COSY",
+            "4": "C13_1D"
+        },
+        "datatype": "exptIdentifiers"
+    },
+    "hostname": {
+        "count": 1,
+        "data": {
+            "0": "0x624bb2cbbfd0"
+        },
+        "datatype": "hostname"
+    },
+    "ml_consent": {
+        "count": 1,
+        "data": {
+            "0": false
+        },
+        "datatype": "ml_consent"
+    },
+    "molfile": {
+        "count": 1,
+        "data": {
+            "0": "\n  CDK    10/13/08,15:9\n\n 14 14  0  0  0  0  0  0  0  0999 V2000\n    3.8971   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2990   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.5981   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0000    1.5000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.2990    2.2500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.2990   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.5981   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.3349   -1.8991    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    5.1962   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.2632   -1.8991    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.5981    1.5000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2990    2.2500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.8971   -2.2500    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n 11  7  1  0  0  0  0 \n  9  7  1  0  0  0  0 \n  7  8  1  0  0  0  0 \n  7  6  1  0  0  0  0 \n  8 12  1  0  0  0  0 \n 13  4  1  0  0  0  0 \n  6  2  1  0  0  0  0 \n  6  4  1  0  0  0  0 \n  5  4  2  0  0  0  0 \n  5 12  1  0  0  0  0 \n  2  3  2  0  0  0  0 \n 10  1  1  0  0  0  0 \n  3  1  1  0  0  0  0 \n  1 14  2  0  0  0  0 \nM  END\n$$$$\n"
+        },
+        "datatype": "molfile"
+    },
+    "nmrAssignments": {
+        "count": 0,
+        "data": {},
+        "datatype": "nmrAssignments"
+    },
+    "numberOfSteps": {
+        "count": 1,
+        "data": {
+            "0": 10000
+        },
+        "datatype": "numberOfSteps"
+    },
+    "ppmGroupSeparation": {
+        "count": 1,
+        "data": {
+            "0": 2
+        },
+        "datatype": "ppmGroupSeparation"
+    },
+    "randomizeStart": {
+        "count": 1,
+        "data": {
+            "0": false
+        },
+        "datatype": "randomizeStart"
+    },
+    "simulatedAnnealing": {
+        "count": 1,
+        "data": {
+            "0": true
+        },
+        "datatype": "simulatedAnnealing"
+    },
+    "smiles": {
+        "count": 1,
+        "data": {
+            "0": "CC(=O)/C=C/C1C(C)=CCCC1(C)C"
+        },
+        "datatype": "smiles"
+    },
+    "spectraWithPeaks": {
+        "count": 2,
+        "data": {
+            "0": "[1H, 13C] HSQC hsqcedetgpsp.3 3.ser_0",
+            "1": "13C 1D zgpg30 5.fid_0"
+        },
+        "datatype": "spectraWithPeaks"
+    },
+    "startingTemperature": {
+        "count": 1,
+        "data": {
+            "0": 1000
+        },
+        "datatype": "startingTemperature"
+    },
+    "workingDirectory": {
+        "count": 1,
+        "data": {
+            "0": "/opt/topspin4.5.0/examdata/exam_CMCse_1"
+        },
+        "datatype": "workingDirectory"
+    },
+    "workingFilename": {
+        "count": 1,
+        "data": {
+            "0": "exam_CMCse_1"
+        },
+        "datatype": "workingFilename"
+    }
+};
+//  
+    // title
+    const title = `dummy_title`;
+    
+    
+
+        // node offset
+    let node_offset = 0;
+    if(dataFrom == 'mnova'){
+        node_offset = 1;
+    }
+
+    // Define scale functions for x and y coordinates
+    const xScale = d3.scaleLinear().domain([0, 1]).range([0, 1000]);
+    const yScale = d3.scaleLinear().domain([0, 1]).range([0, 600]);
+
+    // define colour blind friendly colours with 50% transparency
+    const orange = 'rgba(255, 165, 0, 1)';
+    const blue = 'rgba(173, 216, 230, 1)';
+    const green = 'rgba(152, 251, 152, 1)';
+    const yellow = 'rgba(255, 255, 0, 1)';
+    const purple = 'rgba(128, 0, 128, 1)';
+    const cyan = 'rgba(0, 255, 255, 1)';
+    const grey = 'rgba(128, 128, 128, 1)';
+
+    const black = 'rgba(0, 0, 0, 1)';
+    const white = 'rgba(255, 255, 255, 1)';
+
+    // assign colours to parts of the molecule
+    const CH3 = cyan;
+    const CH2 = yellow;
+    const CH = green;
+    const C = orange;
+
+    const cosyEdgeColor = blue;
+    const cosyEdgeHoverOpacity = 0.0;
+    const hmbcEdgeColor = grey;
+
+    const nodeHoverColor = "lightgrey";
+    const nodeHoverOpacity = 0.4;
+    const textHoverOpacity = 0;
+
+    // define node dimensions
+    const nodeRadius = 22;
+    const nodeRadiusSmall = 15;
+    const nodeRadiusLarge = 26;
+
+    // define edge widths
+    const cosyEdgeWidth = 8;
+    const hmbcEdgeWidth = 8;
+    const noesyEdgeWidth = 8;
+
+    // define font size
+    const fontSizeStr = "12px";
+    const fontSizeInt = 12;
+
+    const textOffsetInt = 8;
+
+    // Define color scale for nodes based on numProtons
+    const colorScale = d3.scaleOrdinal()
+      .domain([0, 1, 2, 3])
+      .range([C, CH, CH2, CH3]); // Blue, Orange, Green, Red
+
+    // Set initial rotation angle
+    let rotation = 0;
+
+    // Select the SVG element
+
+    // Initial transformation
+    const initialTransform = d3.zoomIdentity.translate(0, 0);
+
+    // Track the current transform
+    let currentTransform = initialTransform;
+
+    // Append a group element to hold the content
+    const svg = d3.select("#svg-image").attr("transform", initialTransform);
+
+    // Add zoom and pan functionality
+    const myZoom = d3.zoom()
+        .scaleExtent([0.5, 5])
+        .on("zoom", handleZoom);
+
+
+    svg.call(myZoom);
+
+    // const arrow = d3.select("#arrow");
+    const molimage = d3.select("#molimage");
+
+    // Define the graph data
+    
+    // catoms
+    var catoms = [
+    {
+        "atomNumber": 1,
+        "id": 0,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 0,
+        "ppm": 198.34814,
+        "ppm_calculated": 197.2,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.7971463972550517,
+        "y": 0.630666069386199
+    },
+    {
+        "atomNumber": 2,
+        "id": 1,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 1,
+        "ppm": 148.95233,
+        "ppm_calculated": 148.25,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.49999428135722457,
+        "y": 0.630666069386199
+    },
+    {
+        "atomNumber": 3,
+        "id": 2,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 1,
+        "ppm": 132.296723,
+        "ppm_calculated": 132.45,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.6485760579489136,
+        "y": 0.4877
+    },
+    {
+        "atomNumber": 4,
+        "id": 3,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 0,
+        "ppm": 131.866118,
+        "ppm_calculated": 132.05,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.3514239420510866,
+        "y": 0.201767861227602
+    },
+    {
+        "atomNumber": 5,
+        "id": 4,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 1,
+        "ppm": 122.618058,
+        "ppm_calculated": 122.53,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.20285360274494862,
+        "y": 0.05880179184140303
+    },
+    {
+        "atomNumber": 6,
+        "id": 5,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 1,
+        "ppm": 54.258628,
+        "ppm_calculated": 54.25,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.3514239420510866,
+        "y": 0.4877
+    },
+    {
+        "atomNumber": 7,
+        "id": 6,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 0,
+        "ppm": 32.463689,
+        "ppm_calculated": 32.4,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.20285360274494862,
+        "y": 0.630666069386199
+    },
+    {
+        "atomNumber": 8,
+        "id": 7,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 2,
+        "ppm": 31.178288,
+        "ppm_calculated": 30.63,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.05427182615325973,
+        "y": 0.4877
+    },
+    {
+        "atomNumber": 9,
+        "id": 8,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 3,
+        "ppm": 26.750731,
+        "ppm_calculated": 27.08,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.3131204727411362,
+        "y": 0.8497091498284406
+    },
+    {
+        "atomNumber": 10,
+        "id": 9,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 3,
+        "ppm": 27.744082,
+        "ppm_calculated": 27.15,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.9457281738467402,
+        "y": 0.4877
+    },
+    {
+        "atomNumber": 11,
+        "id": 10,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 3,
+        "ppm": 26.886047,
+        "ppm_calculated": 27.08,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.09257529546321018,
+        "y": 0.8497091498284406
+    },
+    {
+        "atomNumber": 12,
+        "id": 11,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 2,
+        "ppm": 22.965504,
+        "ppm_calculated": 23.02,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.05427182615325973,
+        "y": 0.201767861227602
+    },
+    {
+        "atomNumber": 13,
+        "id": 12,
+        "iupacLabel": "",
+        "jCouplingClass": "",
+        "jCouplingVals": "",
+        "numProtons": 3,
+        "ppm": 22.715037,
+        "ppm_calculated": 22.7,
+        "symbol": "C",
+        "visible": "false",
+        "x": 0.49999428135722457,
+        "y": 0.05880179184140303
+    }
+];
+    // nodes
+    var nodes = [{'symbol': 'C', 'atomNumber': 1, 'ppm': 198.34814, 'ppm_calculated': 197.2, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.7971463972550517, 'y': 0.630666069386199, 'id': 0}, {'symbol': 'C', 'atomNumber': 2, 'ppm': 148.95233, 'ppm_calculated': 148.25, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.49999428135722457, 'y': 0.630666069386199, 'H1_ppm': [6.592473382380121], 'id': 1}, {'symbol': 'C', 'atomNumber': 3, 'ppm': 132.296723, 'ppm_calculated': 132.45, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.6485760579489136, 'y': 0.4877, 'H1_ppm': [6.027089025209533], 'id': 2}, {'symbol': 'C', 'atomNumber': 4, 'ppm': 131.866118, 'ppm_calculated': 132.05, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3514239420510866, 'y': 0.201767861227602, 'id': 3}, {'symbol': 'C', 'atomNumber': 5, 'ppm': 122.618058, 'ppm_calculated': 122.53, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.20285360274494862, 'y': 0.05880179184140303, 'H1_ppm': [5.479584689763677], 'id': 4}, {'symbol': 'C', 'atomNumber': 6, 'ppm': 54.258628, 'ppm_calculated': 54.25, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3514239420510866, 'y': 0.4877, 'H1_ppm': [2.261870301427219], 'id': 5}, {'symbol': 'C', 'atomNumber': 7, 'ppm': 32.463689, 'ppm_calculated': 32.4, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.20285360274494862, 'y': 0.630666069386199, 'id': 6}, {'symbol': 'C', 'atomNumber': 8, 'ppm': 31.178288, 'ppm_calculated': 30.63, 'numProtons': 2, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.05427182615325973, 'y': 0.4877, 'H1_ppm': [1.4361081278902983, 1.2054748689410284], 'id': 7}, {'symbol': 'C', 'atomNumber': 10, 'ppm': 27.744082, 'ppm_calculated': 27.15, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.9457281738467402, 'y': 0.4877, 'H1_ppm': [0.8309217010824879], 'id': 9}, {'symbol': 'C', 'atomNumber': 11, 'ppm': 26.886047, 'ppm_calculated': 27.08, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.09257529546321018, 'y': 0.8497091498284406, 'H1_ppm': [2.2299501828561485], 'id': 10}, {'symbol': 'C', 'atomNumber': 9, 'ppm': 26.750731, 'ppm_calculated': 27.08, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3131204727411362, 'y': 0.8497091498284406, 'H1_ppm': [0.9062460479228267], 'id': 8}, {'symbol': 'C', 'atomNumber': 12, 'ppm': 22.965504, 'ppm_calculated': 23.02, 'numProtons': 2, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.05427182615325973, 'y': 0.201767861227602, 'H1_ppm': [2.0261726214309204], 'id': 11}, {'symbol': 'C', 'atomNumber': 13, 'ppm': 22.715037, 'ppm_calculated': 22.7, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.49999428135722457, 'y': 0.05880179184140303, 'H1_ppm': [1.5454806012064468], 'id': 12}];
+    // nodes_orig
+    var nodes_orig = [{'symbol': 'C', 'atomNumber': 1, 'ppm': 198.34814, 'ppm_calculated': 197.2, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.7971463972550517, 'y': 0.630666069386199, 'id': 0}, {'symbol': 'C', 'atomNumber': 2, 'ppm': 148.95233, 'ppm_calculated': 148.25, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.49999428135722457, 'y': 0.630666069386199, 'H1_ppm': [6.592473382380121], 'id': 1}, {'symbol': 'C', 'atomNumber': 3, 'ppm': 132.296723, 'ppm_calculated': 132.45, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.6485760579489136, 'y': 0.4877, 'H1_ppm': [6.027089025209533], 'id': 2}, {'symbol': 'C', 'atomNumber': 4, 'ppm': 131.866118, 'ppm_calculated': 132.05, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3514239420510866, 'y': 0.201767861227602, 'id': 3}, {'symbol': 'C', 'atomNumber': 5, 'ppm': 122.618058, 'ppm_calculated': 122.53, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.20285360274494862, 'y': 0.05880179184140303, 'H1_ppm': [5.479584689763677], 'id': 4}, {'symbol': 'C', 'atomNumber': 6, 'ppm': 54.258628, 'ppm_calculated': 54.25, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3514239420510866, 'y': 0.4877, 'H1_ppm': [2.261870301427219], 'id': 5}, {'symbol': 'C', 'atomNumber': 7, 'ppm': 32.463689, 'ppm_calculated': 32.4, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.20285360274494862, 'y': 0.630666069386199, 'id': 6}, {'symbol': 'C', 'atomNumber': 8, 'ppm': 31.178288, 'ppm_calculated': 30.63, 'numProtons': 2, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.05427182615325973, 'y': 0.4877, 'H1_ppm': [1.4361081278902983, 1.2054748689410284], 'id': 7}, {'symbol': 'C', 'atomNumber': 10, 'ppm': 27.744082, 'ppm_calculated': 27.15, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.9457281738467402, 'y': 0.4877, 'H1_ppm': [0.8309217010824879], 'id': 9}, {'symbol': 'C', 'atomNumber': 11, 'ppm': 26.886047, 'ppm_calculated': 27.08, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.09257529546321018, 'y': 0.8497091498284406, 'H1_ppm': [2.2299501828561485], 'id': 10}, {'symbol': 'C', 'atomNumber': 9, 'ppm': 26.750731, 'ppm_calculated': 27.08, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3131204727411362, 'y': 0.8497091498284406, 'H1_ppm': [0.9062460479228267], 'id': 8}, {'symbol': 'C', 'atomNumber': 12, 'ppm': 22.965504, 'ppm_calculated': 23.02, 'numProtons': 2, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.05427182615325973, 'y': 0.201767861227602, 'H1_ppm': [2.0261726214309204], 'id': 11}, {'symbol': 'C', 'atomNumber': 13, 'ppm': 22.715037, 'ppm_calculated': 22.7, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.49999428135722457, 'y': 0.05880179184140303, 'H1_ppm': [1.5454806012064468], 'id': 12}];
+    // nodes_now
+    var nodes_now = [{'symbol': 'C', 'atomNumber': 1, 'ppm': 198.34814, 'ppm_calculated': 197.2, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.7971463972550517, 'y': 0.630666069386199, 'id': 0}, {'symbol': 'C', 'atomNumber': 2, 'ppm': 148.95233, 'ppm_calculated': 148.25, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.49999428135722457, 'y': 0.630666069386199, 'H1_ppm': [6.592473382380121], 'id': 1}, {'symbol': 'C', 'atomNumber': 3, 'ppm': 132.296723, 'ppm_calculated': 132.45, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.6485760579489136, 'y': 0.4877, 'H1_ppm': [6.027089025209533], 'id': 2}, {'symbol': 'C', 'atomNumber': 4, 'ppm': 131.866118, 'ppm_calculated': 132.05, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3514239420510866, 'y': 0.201767861227602, 'id': 3}, {'symbol': 'C', 'atomNumber': 5, 'ppm': 122.618058, 'ppm_calculated': 122.53, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.20285360274494862, 'y': 0.05880179184140303, 'H1_ppm': [5.479584689763677], 'id': 4}, {'symbol': 'C', 'atomNumber': 6, 'ppm': 54.258628, 'ppm_calculated': 54.25, 'numProtons': 1, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3514239420510866, 'y': 0.4877, 'H1_ppm': [2.261870301427219], 'id': 5}, {'symbol': 'C', 'atomNumber': 7, 'ppm': 32.463689, 'ppm_calculated': 32.4, 'numProtons': 0, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.20285360274494862, 'y': 0.630666069386199, 'id': 6}, {'symbol': 'C', 'atomNumber': 8, 'ppm': 31.178288, 'ppm_calculated': 30.63, 'numProtons': 2, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.05427182615325973, 'y': 0.4877, 'H1_ppm': [1.4361081278902983, 1.2054748689410284], 'id': 7}, {'symbol': 'C', 'atomNumber': 10, 'ppm': 27.744082, 'ppm_calculated': 27.15, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.9457281738467402, 'y': 0.4877, 'H1_ppm': [0.8309217010824879], 'id': 9}, {'symbol': 'C', 'atomNumber': 11, 'ppm': 26.886047, 'ppm_calculated': 27.08, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.09257529546321018, 'y': 0.8497091498284406, 'H1_ppm': [2.2299501828561485], 'id': 10}, {'symbol': 'C', 'atomNumber': 9, 'ppm': 26.750731, 'ppm_calculated': 27.08, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.3131204727411362, 'y': 0.8497091498284406, 'H1_ppm': [0.9062460479228267], 'id': 8}, {'symbol': 'C', 'atomNumber': 12, 'ppm': 22.965504, 'ppm_calculated': 23.02, 'numProtons': 2, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.05427182615325973, 'y': 0.201767861227602, 'H1_ppm': [2.0261726214309204], 'id': 11}, {'symbol': 'C', 'atomNumber': 13, 'ppm': 22.715037, 'ppm_calculated': 22.7, 'numProtons': 3, 'iupacLabel': '', 'jCouplingVals': '', 'jCouplingClass': '', 'x': 0.49999428135722457, 'y': 0.05880179184140303, 'H1_ppm': [1.5454806012064468], 'id': 12}];
+    // links
+    var links = [];
+    // molgraph
+    var molgraph = {'directed': false, 'multigraph': false, 'graph': {}, 'nodes': [{'symbol': 'C', 'atom_number': 6, 'numProtons': 0, 'id0': 0, 'x': 0.7971463972550517, 'y': 0.630666069386199, 'ppm': 198.34814, 'atomNumber': 1, 'id': 0}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 1, 'id0': 1, 'x': 0.49999428135722457, 'y': 0.630666069386199, 'ppm': 148.95233, 'atomNumber': 2, 'id': 1}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 1, 'id0': 2, 'x': 0.6485760579489136, 'y': 0.4877, 'ppm': 132.296723, 'atomNumber': 3, 'id': 2}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 0, 'id0': 3, 'x': 0.3514239420510866, 'y': 0.201767861227602, 'ppm': 131.866118, 'atomNumber': 4, 'id': 3}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 1, 'id0': 4, 'x': 0.20285360274494862, 'y': 0.05880179184140303, 'ppm': 122.618058, 'atomNumber': 5, 'id': 4}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 1, 'id0': 5, 'x': 0.3514239420510866, 'y': 0.4877, 'ppm': 54.258628, 'atomNumber': 6, 'id': 5}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 0, 'id0': 6, 'x': 0.20285360274494862, 'y': 0.630666069386199, 'ppm': 32.463689, 'atomNumber': 7, 'id': 6}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 2, 'id0': 7, 'x': 0.05427182615325973, 'y': 0.4877, 'ppm': 31.178288, 'atomNumber': 8, 'id': 7}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 3, 'id0': 8, 'x': 0.3131204727411362, 'y': 0.8497091498284406, 'ppm': 26.750731, 'atomNumber': 9, 'id': 8}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 3, 'id0': 9, 'x': 0.9457281738467402, 'y': 0.4877, 'ppm': 27.744082, 'atomNumber': 10, 'id': 9}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 3, 'id0': 10, 'x': 0.09257529546321018, 'y': 0.8497091498284406, 'ppm': 26.886047, 'atomNumber': 11, 'id': 10}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 2, 'id0': 11, 'x': 0.05427182615325973, 'y': 0.201767861227602, 'ppm': 22.965504, 'atomNumber': 12, 'id': 11}, {'symbol': 'C', 'atom_number': 6, 'numProtons': 3, 'id0': 12, 'x': 0.49999428135722457, 'y': 0.05880179184140303, 'ppm': 22.715037, 'atomNumber': 13, 'id': 12}, {'symbol': 'O', 'atom_number': 8, 'numProtons': 0, 'id0': 13, 'x': 0.7971463972550517, 'y': 0.9165982081585969, 'ppm': 10000, 'id': 13}], 'links': [{'source': 0, 'target': 9}, {'source': 0, 'target': 2}, {'source': 0, 'target': 13}, {'source': 1, 'target': 5}, {'source': 1, 'target': 2}, {'source': 3, 'target': 12}, {'source': 3, 'target': 5}, {'source': 3, 'target': 4}, {'source': 4, 'target': 11}, {'source': 5, 'target': 6}, {'source': 6, 'target': 10}, {'source': 6, 'target': 8}, {'source': 6, 'target': 7}, {'source': 7, 'target': 11}]};
+    // shortest_paths
+    var shortest_paths = {"0": {"0": 0, "1": 2, "2": 1, "3": 4, "4": 5, "5": 3, "6": 4, "7": 5, "8": 5, "9": 1, "10": 5, "11": 6, "12": 5, "13": 1}, "1": {"0": 2, "1": 0, "2": 1, "3": 2, "4": 3, "5": 1, "6": 2, "7": 3, "8": 3, "9": 3, "10": 3, "11": 4, "12": 3, "13": 3}, "2": {"0": 1, "1": 1, "2": 0, "3": 3, "4": 4, "5": 2, "6": 3, "7": 4, "8": 4, "9": 2, "10": 4, "11": 5, "12": 4, "13": 2}, "3": {"0": 4, "1": 2, "2": 3, "3": 0, "4": 1, "5": 1, "6": 2, "7": 3, "8": 3, "9": 5, "10": 3, "11": 2, "12": 1, "13": 5}, "4": {"0": 5, "1": 3, "2": 4, "3": 1, "4": 0, "5": 2, "6": 3, "7": 2, "8": 4, "9": 6, "10": 4, "11": 1, "12": 2, "13": 6}, "5": {"0": 3, "1": 1, "2": 2, "3": 1, "4": 2, "5": 0, "6": 1, "7": 2, "8": 2, "9": 4, "10": 2, "11": 3, "12": 2, "13": 4}, "6": {"0": 4, "1": 2, "2": 3, "3": 2, "4": 3, "5": 1, "6": 0, "7": 1, "8": 1, "9": 5, "10": 1, "11": 2, "12": 3, "13": 5}, "7": {"0": 5, "1": 3, "2": 4, "3": 3, "4": 2, "5": 2, "6": 1, "7": 0, "8": 2, "9": 6, "10": 2, "11": 1, "12": 4, "13": 6}, "8": {"0": 5, "1": 3, "2": 4, "3": 3, "4": 4, "5": 2, "6": 1, "7": 2, "8": 0, "9": 6, "10": 2, "11": 3, "12": 4, "13": 6}, "9": {"0": 1, "1": 3, "2": 2, "3": 5, "4": 6, "5": 4, "6": 5, "7": 6, "8": 6, "9": 0, "10": 6, "11": 7, "12": 6, "13": 2}, "10": {"0": 5, "1": 3, "2": 4, "3": 3, "4": 4, "5": 2, "6": 1, "7": 2, "8": 2, "9": 6, "10": 0, "11": 3, "12": 4, "13": 6}, "11": {"0": 6, "1": 4, "2": 5, "3": 2, "4": 1, "5": 3, "6": 2, "7": 1, "8": 3, "9": 7, "10": 3, "11": 0, "12": 3, "13": 7}, "12": {"0": 5, "1": 3, "2": 4, "3": 1, "4": 2, "5": 2, "6": 3, "7": 4, "8": 4, "9": 6, "10": 4, "11": 3, "12": 0, "13": 6}, "13": {"0": 1, "1": 3, "2": 2, "3": 5, "4": 6, "5": 4, "6": 5, "7": 6, "8": 6, "9": 2, "10": 6, "11": 7, "12": 6, "13": 0}};
+    // best_results
+    var best_results = {'best_weight': 0, 'best_mae': 0.31408684615384774, 'best_lae': 1.1481400000000122, 'best_lae_atomNumber': 1};
+
+  
+
+    var svg_bckgrnd_image_str = `<?xml version='1.0' encoding='iso-8859-1'?>
+<svg class="center" version='1.1' baseProfile='full'
+              xmlns='http://www.w3.org/2000/svg'
+                      xmlns:rdkit='http://www.rdkit.org/xml'
+                      xmlns:xlink='http://www.w3.org/1999/xlink'
+                  xml:space='preserve'
+width=1000 height=600 viewBox='0 0 1000 600'>
+<!-- END OF HEADER -->
+<g transform='translate(0, 0)'>
+<rect style='opacity:1.0;fill:none;stroke:none' width='1000.0' height='600.0' x='0.0' y='0.0'> </rect>
+<path class='bond-0 atom-10 atom-6' d='M 92.6,509.8 L 202.9,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-1 atom-8 atom-6' d='M 313.1,509.8 L 202.9,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-6 atom-7' d='M 202.9,378.4 L 54.3,292.6' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-3 atom-6 atom-5' d='M 202.9,378.4 L 351.4,292.6' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-4 atom-7 atom-11' d='M 54.3,292.6 L 54.3,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-5 atom-12 atom-3' d='M 500.0,35.3 L 351.4,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-6 atom-5 atom-1' d='M 351.4,292.6 L 500.0,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-7 atom-5 atom-3' d='M 351.4,292.6 L 351.4,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-8 atom-4 atom-3' d='M 202.9,35.3 L 351.4,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-8 atom-4 atom-3' d='M 202.9,65.0 L 325.7,135.9' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-9 atom-4 atom-11' d='M 202.9,35.3 L 54.3,121.1' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-10 atom-1 atom-2' d='M 500.0,378.4 L 648.6,292.6' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-10 atom-1 atom-2' d='M 500.0,348.7 L 635.7,270.3' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-11 atom-9 atom-0' d='M 945.7,292.6 L 797.1,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-12 atom-2 atom-0' d='M 648.6,292.6 L 797.1,378.4' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 784.3,371.0 L 784.3,450.5' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 784.3,450.5 L 784.3,530.0' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 810.0,371.0 L 810.0,450.5' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-13 atom-0 atom-13' d='M 810.0,450.5 L 810.0,530.0' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path d='M 804.6,374.1 L 797.1,378.4 L 789.7,374.1' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 492.6,374.1 L 500.0,378.4 L 507.4,374.1' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 641.1,296.9 L 648.6,292.6 L 656.0,296.9' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 210.3,39.6 L 202.9,35.3 L 195.4,39.6' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 61.7,296.9 L 54.3,292.6 L 54.3,284.0' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 54.3,129.6 L 54.3,121.1 L 61.7,116.8' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path class='atom-13' d='M 784.1 550.0
+Q 784.1 543.2, 787.5 539.4
+Q 790.9 535.6, 797.1 535.6
+Q 803.4 535.6, 806.8 539.4
+Q 810.1 543.2, 810.1 550.0
+Q 810.1 556.9, 806.7 560.8
+Q 803.3 564.7, 797.1 564.7
+Q 790.9 564.7, 787.5 560.8
+Q 784.1 557.0, 784.1 550.0
+M 797.1 561.5
+Q 801.5 561.5, 803.8 558.6
+Q 806.1 555.7, 806.1 550.0
+Q 806.1 544.5, 803.8 541.7
+Q 801.5 538.8, 797.1 538.8
+Q 792.8 538.8, 790.5 541.6
+Q 788.1 544.4, 788.1 550.0
+Q 788.1 555.8, 790.5 558.6
+Q 792.8 561.5, 797.1 561.5
+' fill='#FF0000'/>
+<path  d='M 92.6,509.8 L 202.9,378.4' class='bond-selector bond-0 atom-10 atom-6' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 313.1,509.8 L 202.9,378.4' class='bond-selector bond-1 atom-8 atom-6' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,378.4 L 54.3,292.6' class='bond-selector bond-2 atom-6 atom-7' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,378.4 L 351.4,292.6' class='bond-selector bond-3 atom-6 atom-5' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 54.3,292.6 L 54.3,121.1' class='bond-selector bond-4 atom-7 atom-11' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 500.0,35.3 L 351.4,121.1' class='bond-selector bond-5 atom-12 atom-3' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 351.4,292.6 L 500.0,378.4' class='bond-selector bond-6 atom-5 atom-1' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 351.4,292.6 L 351.4,121.1' class='bond-selector bond-7 atom-5 atom-3' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,35.3 L 351.4,121.1' class='bond-selector bond-8 atom-4 atom-3' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 202.9,35.3 L 54.3,121.1' class='bond-selector bond-9 atom-4 atom-11' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 500.0,378.4 L 648.6,292.6' class='bond-selector bond-10 atom-1 atom-2' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 945.7,292.6 L 797.1,378.4' class='bond-selector bond-11 atom-9 atom-0' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 648.6,292.6 L 797.1,378.4' class='bond-selector bond-12 atom-2 atom-0' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<path  d='M 797.1,378.4 L 797.1,550.0' class='bond-selector bond-13 atom-0 atom-13' style='fill:#fff;stroke:#fff;stroke-width:4.0px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='797.1' cy='378.4' r='22.9' class='atom-selector atom-0' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='500.0' cy='378.4' r='22.9' class='atom-selector atom-1' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='648.6' cy='292.6' r='22.9' class='atom-selector atom-2' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='351.4' cy='121.1' r='22.9' class='atom-selector atom-3' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='202.9' cy='35.3' r='22.9' class='atom-selector atom-4' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='351.4' cy='292.6' r='22.9' class='atom-selector atom-5' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='202.9' cy='378.4' r='22.9' class='atom-selector atom-6' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='54.3' cy='292.6' r='22.9' class='atom-selector atom-7' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='313.1' cy='509.8' r='22.9' class='atom-selector atom-8' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='945.7' cy='292.6' r='22.9' class='atom-selector atom-9' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='92.6' cy='509.8' r='22.9' class='atom-selector atom-10' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='54.3' cy='121.1' r='22.9' class='atom-selector atom-11' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='500.0' cy='35.3' r='22.9' class='atom-selector atom-12' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+<circle  cx='797.1' cy='550.0' r='22.9' class='atom-selector atom-13' style='fill:#fff;stroke:#fff;stroke-width:1px;fill-opacity:0;stroke-opacity:0' />
+</g>
+</svg>
+`;
+    
+
+
+    // Modify INFO tooltip to display the best results from the optimization with only 2 decimal places
+    // d3.select("#info_results").html(`Correlation Penalty: ${best_results.best_weight}, MAE: ${best_results.best_mae.toFixed(2)} NODE ${best_results.best_lae_atomNumber} LAE: ${best_results.best_lae.toFixed(2)}`);
+    d3.select("#info_results").html(`Correlation Penalty: ${best_results.best_weight}, MAE: ${best_results.best_mae.toFixed(2)}, LAE: ${best_results.best_lae.toFixed(2)} (NODE ${best_results.best_lae_atomNumber})`);
+
+
+    // Set the visible property of the catoms array to false
+    // loop through the nodes
+    catoms.forEach(node => {
+        node.visible = false;
+    });
+
+    // Set the visible property of the catoms array to false
+    // loop through the nodes
+    nodes.forEach(node => {
+        // find the id of the node in the catoms array set  visible property to the catom object to true
+        const catom = catoms.find(catom => catom.id === node.id);
+        if (catom) {
+            catom.visible = true;
+            catom.ppm =  node.ppm;
+            catom.iupacLabel = node.iupacLabel;
+            catom.jCouplingVals = node.jCouplingVals;
+            catom.jCouplingClass = node.jCouplingClass;
+            catom.H1_ppm = node.H1_ppm;
+        }
+    })
+
+    var catoms_orig = JSON.parse(JSON.stringify(catoms));
+
+    // Set initial positions of nodes and links
+    nodes.forEach(node => {
+        node.x = xScale(node.x);
+        node.y = yScale(node.y);
+    });
+
+    nodes_orig.forEach(node => {
+        node.x = xScale(node.x);
+        node.y = yScale(node.y);
+    });
+
+    catoms.forEach(node => {
+        node.x = xScale(node.x);
+        node.y = yScale(node.y);
+    });
+
+    catoms_orig.forEach(node => {
+        node.x = xScale(node.x);
+        node.y = yScale(node.y);
+    });
+
+    // define mapping
+    var mapping = {};
+    for(var i=0; i<catoms_orig.length; i++) {
+        mapping[catoms_orig[i]["id"]] = catoms_orig[i]["id"];
+    }
+
+    nodes = JSON.parse(JSON.stringify(catoms.filter(node => node.visible)));
+    
+
+    // Set initial positions of nodes and links
+
+    const linksGroup = d3.select("svg g").attr("class", "links-group");
+
+    // Filter links that have the attribute cosy as true
+    // const cosyLinks = links.filter(link => link.cosy);
+    const cosyLinks = links.filter(eachLink => eachLink.cosy);
+    const hmbcLinksData = links.filter(eachLink => eachLink.hmbc);
+
+
+    function colorHmbcLinksByDistance(mapping, offset) {
+        d3.selectAll(".hmbc-link").attr("stroke", d => {
+            const sourceId = mapping[d.source] - offset;
+            const targetId = mapping[d.target] - offset;
+            
+            // Check if the path length is greater than 2 (long range)
+            if (shortest_paths[sourceId] && 
+                shortest_paths[sourceId][targetId] && 
+                shortest_paths[sourceId][targetId] > 2) {
+                return "#FF5733"; // Red color for long range HMBC links
+            } else {
+                return "#808080"; // Grey color for short range HMBC links
+            }
+        });
+        
+        console.log("HMBC links colored by distance");
+    }
+
+    // Create the COSY links to start
+    // Create a group for links
+    const link = linksGroup.selectAll(".links-group")
+        .data(cosyLinks)
+        .enter().append("line")
+        .attr("class", "link")
+        .attr("class", "cosy-link")
+        .attr("stroke", cosyEdgeColor)
+        .attr("source", d => d.source)
+        .attr("target", d => d.target)
+        .attr("x1", d => nodes.find(node => node.id === d.source).x)
+        .attr("y1", d => nodes.find(node => node.id === d.source).y)
+        .attr("x2", d => nodes.find(node => node.id === d.target).x)
+        .attr("y2", d => nodes.find(node => node.id === d.target).y)
+        .attr("stroke-width", cosyEdgeWidth); // Set the stroke width to 8 pixels
+
+
+    // Edge initialization
+    const hmbclinks_svg = linksGroup.selectAll(".links-group")
+        .data(hmbcLinksData)
+        .enter().append("line")
+        .attr("class", "link hmbc-link")
+        .attr("stroke", hmbcEdgeColor)
+        .attr("x1", d => nodes.find(node => node.id === d.source).x)
+        .attr("y1", d => nodes.find(node => node.id === d.source).y)
+        .attr("x2", d => nodes.find(node => node.id === d.target).x)
+        .attr("y2", d => nodes.find(node => node.id === d.target).y)
+        .attr("source", d => d.source)
+        .attr("target", d => d.target)
+        .attr("opacity", 0) // Initially hidden with opacity
+        .attr("stroke-width", hmbcEdgeWidth);
+
+    // colorHmbcLinksByDistance(); // Color HMBC links by distance
+    colorHmbcLinksByDistance(mapping, node_offset);
+
+
+
+    const svg_display = d3.select('svg')
+    const nodesGroup = d3.select("svg g").attr("class", "nodes-group");
+
+    // Create the nodes
+    const allnodes = nodesGroup.selectAll(".nodes-group")
+      .data(nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", d => `translate(${d.x},${d.y})`)
+      .attr("atomNumber", d => d.atomNumber)
+      .attr("id", d => d.id)
+      .attr("ppm", d => d.ppm)
+      .attr("ppm_calculated", d => d.ppm_calculated)
+      .attr("numProtons", d => d.numProtons)
+      .attr("x", d => d.x)
+      .attr("y", d => d.y)
+      .on("mouseover", (event, d) => handleMouseOver(event, d)) // Call function when mouseover
+      .on("mouseout", (event, d) => handleMouseOut(event, d))  // Call function when mouseout
+      .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+
+    // Add circles to represent nodes
+    allnodes.append("circle")
+      .attr("r", nodeRadius)
+      .attr("fill", d => colorScale(d.numProtons)) // Set fill color based on numProtons
+
+    // Append atomNumber text
+    allnodes.append("text")
+        .attr("class", "node-text-atomNumber")
+        // .text(d => `${d.id}, ${d.atomNumber}`) // Display the id
+        .text(d => `${d.atomNumber}`) // Display the id
+        .attr("dy", -textOffsetInt) // Center the text vertically
+        .attr("font-size", fontSizeStr) // Set font size to 16 pixels
+        .attr("text-anchor", "middle"); // Center the text horizontally
+
+    // Append ppm text
+    allnodes.append("text")
+        .attr("class", "node-text-ppm")
+        .text(d => d.ppm.toFixed(2)) // Display the id
+        .attr("dy", +textOffsetInt) // Center the text vertically
+        .attr("font-size", fontSizeStr) // Set font size to 16 pixels
+        .attr("text-anchor", "middle"); // Center the text horizontally
+
+    // Tooltip for node hover
+    const tooltip = d3.select("#tooltip");
+
+    tooltip.style("opacity", 0);
+
+    let hmbcLinks = []; // Track hmbc links separately
+    var circlenodes = document.querySelectorAll('.node circle');
+    var textnodes = document.querySelectorAll('.node text');
+
+    // split textnodes into atomNumber and ppm
+    var nodetextppm = [];
+    var nodetextatomNumber = [];
+    for(var i=0; i<textnodes.length; i+=2) {
+        nodetextatomNumber.push(textnodes[i]);
+        nodetextppm.push(textnodes[i+1]);
+    }
+
+    var dragstartedFlag = false;
+
+    // Drag handlers
+    function dragstarted(event, d) {
+        // change the opacity of the cosy links to 0
+        link.style("opacity", 0);
+        // Remove hmbc links
+        // hmbcLinks.forEach(eachHMBClink => eachHMBClink.remove());
+        // hmbcLinks = []; // Clear the hmbc links array
+        d3.select(this).raise().classed("active", true);
+        dragstartedFlag = true;
+    }
+
+    function dragged(event, d) {
+        d.x = event.x;
+        d.y = event.y;
+        link.filter(l => l.source === d.id).attr("x1", d.x).attr("y1", d.y);
+        link.filter(l => l.target === d.id).attr("x2", d.x).attr("y2", d.y);
+        hmbclinks_svg.filter(l => l.source === d.id).attr("x1", d.x).attr("y1", d.y);
+        hmbclinks_svg.filter(l => l.target === d.id).attr("x2", d.x).attr("y2", d.y);
+
+        d3.select(this).attr("transform", `translate(${d.x},${d.y})`);
+    }
+
+    function dragended(event, d) {
+      d3.select(this).classed("active", false);
+      dragstartedFlag = false;
+      handleMouseOver(event, d); // Call handleMouseOut function to reset the view
+    }
+
+
+    // Function to handle zoom start
+    function handleZoomStart(event) {
+        console.log("Zoom started");
+        // do not update the screen while zooming
+    }
+
+    function handleZoom(event) {
+        currentTransform = event.transform;
+
+        // console.log(`Zooming: k: ${currentTransform.k}, x: ${currentTransform.x}, y: ${currentTransform.y}`);
+        // arrow.attr("transform", `${currentTransform} rotate(${rotation}, ${500}, ${200})`);
+        molimage.attr("transform", `${currentTransform} rotate(${rotation}, ${500}, ${200})`);
+        // update
+
+        scaleLevel = event.transform.k;
+
+        currentTransform = event.transform;
+
+        // Keep nodes the same size regardless of zoom level
+        allnodes.selectAll("circle")
+            .attr("r", nodeRadius / (scaleLevel));
+
+        // Keep text elements horizontal by applying a counter-rotation, adjust font size, and offset positions
+        allnodes.selectAll(".node-text-atomNumber")
+            // .attr("transform", `rotate(${-rotationAngle})`)
+            .attr("font-size", `${fontSizeInt / scaleLevel}px`)        // Adjust font size
+            .attr("dy", `${-textOffsetInt / scaleLevel}px`);              // Adjust vertical offset for atom number text
+
+        allnodes.selectAll(".node-text-ppm")
+            // .attr("transform", `rotate(${-rotationAngle})`)
+            .attr("font-size", `${fontSizeInt / scaleLevel}px`)        // Adjust font size
+            .attr("dy", `${textOffsetInt / scaleLevel}px`);               // Adjust vertical offset for ppm text
+
+        // Keep link stroke width constant by adjusting inversely with the scale level
+        linksGroup.selectAll("line")
+            .attr("stroke-width", `${hmbcEdgeWidth / scaleLevel}px`); // Adjust stroke width to counter zoom
+        
+    }
+
+    function handleZoomEnd(event) {
+        console.log("Zoom ended");
+        // reapply the rotation
+        //svg.attr("transform", `${currentTransform} rotate(${rotation}, ${0}, ${0})`);
+    }
+
+    // Function to handle rotation
+    function rotateSVG(angle) {
+        rotation = (rotation + angle) % 360;
+        // Apply the rotation around the new center
+        // arrow.attr("transform", `${currentTransform} rotate(${rotation}, ${500}, ${200})`);
+        molimage.attr("transform", `${currentTransform} rotate(${rotation}, ${500}, ${200})`);
+
+        // Keep text elements horizontal by applying a counter-rotation
+        allnodes.selectAll(".node-text-atomNumber")
+            .attr("transform", `rotate(${-rotation})`)
+        allnodes.selectAll(".node-text-ppm")
+            .attr("transform", `rotate(${-rotation})`)
+    }
+
+    // Add keydown event listener for rotation
+    d3.select("body").on("keydown", (event) => {
+        if (event.key === "R" && event.shiftKey) {
+            rotateSVG(90);
+        }
+        else if (event.key === "L" && event.shiftKey) {
+            rotateSVG(-90);
+        }
+        else if (event.key === "r" || event.key === "R") {
+            console.log("Rotate SVG");
+            rotateSVG(10);
+        }
+        else if ( event.key === "l" || event.key === "L") {
+            rotateSVG(-10);
+        }
+    });
+
+
+    // Function to find nearest neighbors and non-nearest neighbours of a node with a specific attribute
+    function findNearestNeighbors(nodeId, attribute) {
+        const neighbors = [];
+        const nonNeighbors = [];
+
+        // Iterate through the links
+        links.forEach(link => {
+            if (link[attribute] && (link.source === nodeId || link.target === nodeId)) {
+                neighbors.push(link.source === nodeId ? link.target : link.source);
+            }
+        });
+
+        // Iterate through all nodes to find non-neighbors
+        nodes.forEach(node => {
+            if (node.id !== nodeId && !neighbors.includes(node.id)) {
+                nonNeighbors.push(node.id);
+            }
+        });
+
+        return { neighbors, nonNeighbors };
+    }
+
+    // Function to display tooltip
+    function displayTooltip(event, d){
+        // generate the html sub string for d.H1 ppm which is an array
+
+        var circlenodes = document.querySelectorAll('.node circle');
+
+        // When numProtons is 0
+        if (d.numProtons == 0) {
+            if (d.ppm_calculated.length == 0) {
+                var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} ppm`;
+            }
+            else {
+                var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} (${d.ppm_calculated.toFixed(2)}) ppm`;
+            }
+        } 
+        else if (d.H1_ppm.length == 1) {
+            // Expect d.H1 to be an array of length 1
+            if (d.ppm_calculated.length == 0) {
+                var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} ppm, <sup>1</sup>H = ${d.H1_ppm[0].toFixed(2)} ppm`;
+            }
+            else {
+                var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} (${d.ppm_calculated.toFixed(2)}) ppm, <sup>1</sup>H = ${d.H1_ppm[0].toFixed(2)} ppm`;
+            }
+                // var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} ppm, <sup>1</sup>H = ${d.H1_ppm[0].toFixed(2)} ppm`;
+            // if jCouplingVals is not empty, add the J coupling values
+            if (d.jCouplingClass.length > 0) {
+                if (d.jCouplingClass === "m" || d.jCouplingClass === "s") {
+                    htmlstr = htmlstr + `<br>J's : ${d.jCouplingClass}`;
+                } 
+                else {
+                // htmlstr = htmlstr + `<br>J's : ${d.jCouplingClass[0]} : ${d.jCouplingVals[0]} Hz`;
+                    htmlstr = htmlstr + `<br>J's : ${d.jCouplingClass} : ${d.jCouplingVals} Hz`;
+                }
+            }
+        } 
+        else {
+            // Expect d.H1 to be an array of length 2
+            if (d.ppm_calculated.length == 0) {
+                var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} ppm, <sup>1</sup>H = ${d.H1_ppm[0].toFixed(2)} & ${d.H1_ppm[1].toFixed(2)} ppm`;
+            }
+            else {
+                var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} (${d.ppm_calculated.toFixed(2)}) ppm, <sup>1</sup>H = ${d.H1_ppm[0].toFixed(2)} & ${d.H1_ppm[1].toFixed(2)} ppm`;
+            }
+            // var htmlstr =  `C${d.atomNumber} ${d.iupacLabel} <b>${generateHTMLnumProtonsString(d.numProtons)}</b>: <sup>13</sup>C = ${d.ppm.toFixed(2)} ppm, <sup>1</sup>H = ${d.H1_ppm[0].toFixed(2)} & ${d.H1_ppm[1].toFixed(2)} ppm`;
+            // add the J coupling values if not empty
+            // print("d.jCouplingClass.length, d.jCouplingVals.length", d.jCouplingClass.length, d.jCouplingVals.length);
+            if(d.jCouplingClass.length > 0) {
+                // htmlstr = htmlstr + `<br>J's : ${d.jCouplingClass[0]} : ${d.jCouplingVals[0]} Hz, ${d.jCouplingClass[1]} : ${d.jCouplingVals[1]} Hz`;
+                if (d.jCouplingClass === "m" || d.jCouplingClass === "s") {
+                    htmlstr = htmlstr + `<br>J's : ${d.jCouplingClass}`;
+                }
+                else {
+                    htmlstr = htmlstr + `<br>J's : ${d.jCouplingClass} : ${d.jCouplingVals} Hz`;
+                }
+            }
+        }
+
+        tooltip.transition()
+            .duration(200)
+            .style("opacity", 9.75);
+        tooltip.html(htmlstr)    
+            .style("left", (-99999) + "px")
+            .style("top", (-99999) + "px")
+            .style("display", "inline-block");
+
+        var tooltipDiv = d3.select('#tooltip');
+
+        // Get the corresponding DOM element
+        var tooltipNode = tooltipDiv.node();
+
+        var pageWidth = document.documentElement.clientWidth;
+
+        // Get the dimensions of the div element
+        var tooltipWidth = tooltipNode.clientWidth;
+        var tooltipHeight = tooltipNode.clientHeight;
+        var tooltipX = (pageWidth - tooltipWidth) / 5;
+
+        tooltip.html(htmlstr) 
+            .style("left", (tooltipX) + "px")
+            .style("top", (25) + "px")
+            .style("display", "inline-block");
+
+        // Increase the radius of the hovered over node using d.id
+        circlenodes.forEach(function(circleNode) {
+            if (circleNode.__data__.id == d.id) {
+                circleNode.setAttribute("r", nodeRadiusLarge/scaleLevel);
+            }
+        });
+    }
+
+
+
+    // Function to highlight HMBC neighbors (updated)
+    function highlightHMBCneighbors(event, d) {
+
+        // check if the HMBC button is sunken and if it is release it and  reset the HMBC links to hidden and default colour
+        if (d3.select("#hmbcButton").classed("sunken")){
+            console.log("sunken");
+            hmbcVisible = false;
+            d3.select("#hmbcButton").classed("sunken", false);
+            hmbclinks_svg.attr("opacity", 0);
+            // hmbclinks_svg.attr("stroke", hmbcEdgeColor);
+            colorHmbcLinksByDistance(mapping, node_offset);
+
+            // check if the COSY button is not sunken, if it is not, set the opacity of the cosy links to 1
+            if (!d3.select("#sunkenButton").classed("sunken")){
+                console.log("COSY button not sunken");
+                // change the opacity of the cosy links to 1
+                link.style("opacity", 1);
+            }
+        }
+        
+        var circlenodes = document.querySelectorAll('.node circle');
+        
+        // Define the attribute to find nearest neighbors
+        const attribute = "hmbc";
+        const attribute2 = "noesy";
+        
+        // Call the function to find nearest neighbors
+        const hmbcNearestNodes = findNearestNeighbors(d.id, attribute);
+        const noesyNearestNodes = findNearestNeighbors(d.id, attribute2);
+
+        const nearestNeighborIDs = hmbcNearestNodes.neighbors;
+        const nearestNeighborIDs2 = noesyNearestNodes.neighbors;
+
+        // change the opacity of the nodes to 0.5
+        hmbcNearestNodes.nonNeighbors.forEach(nonNeighborId => {
+            circlenodes.forEach(function(circleNode) {
+                if (circleNode.__data__.id == nonNeighborId) {
+                    circleNode.style.opacity = nodeHoverOpacity;
+                    circleNode.setAttribute("r", nodeRadiusSmall/scaleLevel);
+                }
+            });
+        });
+        
+        // set the font colour to grey for all the text nodes
+        hmbcNearestNodes.nonNeighbors.forEach(i => {
+            textnodes.forEach(function(textNode) {
+                if (textNode.__data__.id == i) {
+                    textNode.style.fill = nodeHoverColor;
+                    textNode.style.opacity = textHoverOpacity;
+                }
+            });
+        });
+
+        // increase the size of the circles for the nearest neighbors
+        nearestNeighborIDs.forEach(i => {
+            circlenodes.forEach(function(circleNode) {
+                if (circleNode.__data__.id == i) {
+                    circleNode.setAttribute("r", nodeRadiusLarge/scaleLevel);
+                }
+            });
+        });
+
+        // change the opacity of the cosy links to 0
+        link.style("opacity", 0);
+
+        // First reset all HMBC links to invisible if the global toggle is off
+        if (!hmbcVisible) {
+            hmbclinks_svg.attr("opacity", 0);
+        }
+
+        // Now show only connections to the current node, regardless of global toggle
+        hmbclinks_svg.filter(l => l.source === d.id).attr("opacity", 1);
+        hmbclinks_svg.filter(l => l.target === d.id).attr("opacity", 1);
+    }
+
+    // Function to handle mouseover event
+    function handleMouseOver(event, d) {
+
+        if (dragstartedFlag) {
+            return;
+        }   
+        // Display tooltip
+        if (event) {
+            displayTooltip(event, d);
+            highlightHMBCneighbors(event,d);
+        }
+    }
+
+    // Function to handle mouseout event
+    function handleMouseOut(event, d) {
+
+        var circlenodes = document.querySelectorAll('.node circle');
+
+        if (dragstartedFlag) {
+            return;
+        }   
+        // change the opacity of the text nodes to 1
+        // reset the font colour of the text in the nodes to black
+        textnodes.forEach( t => {
+            t.style.opacity = 1;
+            t.style.fill = 'black';
+        });
+
+        // set the opacity of all the nodes to 1
+        circlenodes.forEach( c => {
+            c.style.opacity = 1;
+        });
+
+        // reset the fill color of all the circles to their original color
+        // loop through the nodes to get the id and numProtons
+        nodes.forEach(d => {
+            circlenodes.forEach( function(circleNode) {
+                if (circleNode.__data__.id == d.id) {
+                    circleNode.style.fill = colorScale(d.numProtons);
+                    circleNode.setAttribute("r", nodeRadius/scaleLevel);
+                }
+            });
+        });
+
+        // Hide the tooltip
+        tooltip.transition()
+                .duration(100)
+                .style("opacity", 0);
+        // Revert the radius
+        d3.select(event.target)
+            .transition()
+            .duration(100)
+            .attr("r", nodeRadius/scaleLevel);
+
+        // Remove hmbc links
+        hmbcLinks.forEach(link => link.remove());
+        hmbcLinks = []; // Clear the hmbc links array
+
+        // change the opacity of the cosy links to 1
+        link.style("opacity", 1);
+
+        // hmbclinks_svg.style("opacity", 0);
+        hmbclinks_svg.filter(l => l.source === d.id).attr("opacity", 0);
+        hmbclinks_svg.filter(l => l.target === d.id).attr("opacity", 0);
+
+        if (d3.select("#infoButton").classed("sunken")){
+            console.log("sunken");
+            laeVisible = false;
+            d3.select("#infoButton").classed("sunken", false);
+
+        }
+    }
+
+    function generateHTMLnumProtonsString(index) {
+        switch (index) {
+            case 0:
+            return "-C-";
+            case 1:
+            return "-CH";
+            case 2:
+            return "-CH<sub>2</sub>";
+            case 3:
+            return "-CH<sub>3</sub>";
+            default:
+            return "<p>Invalid index</p>";
+        }
+    }
+
+    function updateMovedAtoms() {
+        // Update the moved atoms
+
+        if( !updateMovedAtoms3()){
+            return
+        };
+
+        nodes = JSON.parse(JSON.stringify(catoms.filter(node => node.visible)));
+
+        // Select all circle elements with the class 'node' in the nodesGroup
+        var circlenodes = nodesGroup.selectAll('.node circle');
+
+        // Add circles to represent nodes
+        // svg.selectAll(".node circle")
+
+        // update node colour
+        nodesGroup.selectAll(".node circle")
+            .data(nodes)
+            .style("fill", d => colorScale(d.numProtons))
+            .raise(); // Display the id
+
+        // update atomNumber
+        nodesGroup.selectAll(".node text.node-text-atomNumber")
+            .data(nodes)
+            // .text(d => `${d.id},${d.atomNumber}`)
+            .text(d => `${d.atomNumber}`)
+            .raise(); // Display the id
+
+        // update the ppm text
+        nodesGroup.selectAll(".node text.node-text-ppm")
+            .data(nodes)
+            .text(d => d.ppm.toFixed(2))
+            .raise(); // Display the ppm
+
+        // move the nodes
+        nodesGroup.selectAll(".node")
+            .data(nodes)
+            .attr("class", "node")
+            .transition()
+            .duration(1000)
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+
+        // update the cosy links
+        svg.selectAll(".link")
+            .data(cosyLinks)
+            .attr("x1", d => nodes.find(node => node.id === d.source).x)
+            .attr("y1", d => nodes.find(node => node.id === d.source).y)
+            .attr("x2", d => nodes.find(node => node.id === d.target).x)
+            .attr("y2", d => nodes.find(node => node.id === d.target).y);
+
+        // update the hmbc links
+        svg.selectAll(".link")
+            .data(hmbcLinksData)
+            .attr("x1", d => nodes.find(node => node.id === d.source).x)
+            .attr("y1", d => nodes.find(node => node.id === d.source).y)
+            .attr("x2", d => nodes.find(node => node.id === d.target).x)
+            .attr("y2", d => nodes.find(node => node.id === d.target).y);
+
+        // recalculate the MAE and LAE
+
+        var mae = 0.0;
+        var lae_best = 0.0;
+        var lae_best_atomNumber = -1;
+        
+        for(var i=0; i<nodes.length; i++) {
+            var mae_latest = Math.abs(nodes[i].ppm - nodes[i].ppm_calculated);
+
+            if (mae_latest > lae_best) {
+                lae_best = mae_latest;
+                lae_best_atomNumber = nodes[i].atomNumber;
+            }
+            mae += mae_latest           
+        }
+        mae = mae/nodes.length;
+
+
+        // define mapping
+        // var mapping = {};
+        for(var i=0; i<catoms_orig.length; i++) {
+            mapping[catoms_orig[i]["id"]] = catoms_orig[i]["id"];
+        }
+
+        var catoms_orig_dict = {};
+        for(var i=0; i<catoms_orig.length; i++) {
+            catoms_orig_dict[catoms_orig[i]["atomNumber"]] = catoms_orig[i]["id"];
+        }
+
+        for(var i=0; i<nodes.length; i++) {
+            var id1 = nodes[i]["id"];
+            var atomNumber1 = nodes[i]["atomNumber"];
+            var id2 = catoms_orig_dict[atomNumber1];
+            mapping[nodes[i]["id"]] = id2;
+        }
+        console.log(`mapping\n`);
+        for (const [key, value] of Object.entries(mapping)) {
+            console.log(`${key}: ${value}`);
+        }
+
+        // recaclulate correlation penalty
+
+        var best_weight = computeTotalWeight2D(links, mapping, shortest_paths, node_offset);
+        console.log(`best_weight ${best_weight}`);
+
+        // update the best results
+      
+        best_results.best_weight = best_weight;
+        best_results.best_mae = mae;
+        best_results.best_lae = lae_best;
+        best_results.best_lae_atomNumber = lae_best_atomNumber;
+
+        // update the INFO tooltip
+        d3.select("#info_results").html(`Correlation Penalty: ${best_results.best_weight}, MAE: ${best_results.best_mae.toFixed(2)}, NODE ${best_results.best_lae_atomNumber} LAE: ${best_results.best_lae.toFixed(2)}`);
+
+        colorHmbcLinksByDistance(mapping, node_offset);
+    }
+
+    function updateMovedAtoms3() {
+
+        console.log("updateMovedAtoms3");
+        // Find the moved nodes and store them in the moved_nodes array
+        const moved_nodes = [];
+        const removed = [];
+        nodes.forEach((node1, index) => {
+            const node2 =  catoms_orig[index];
+            if (node1.x !== node2.x || node1.y !== node2.y) {
+                moved_nodes.push(JSON.parse(JSON.stringify(node1)));
+                removed.push(false)
+            }
+        });
+
+        if(moved_nodes.length == 0){
+            return false;
+        }
+
+
+        // Find the closest nodes to the moved nodes
+        // Store the indices of the moved nodes and the closest nodes in the closest array
+        // keep also the distance between the moved node and the closest node
+        const closest_nodes = [];
+        const closest_catoms = [];
+        moved_nodes.forEach((node1, idx) => {
+            // Calculate Euclidean distance between the moved node and all other nodes
+            const distances_nodes = catoms_orig.map(node2 => 
+                Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2)
+            );
+            
+            // Find the closest node
+            const minValue1 = Math.min(...distances_nodes);  // Gets the minimum value, which is 3
+            const closest_node_idx = distances_nodes.indexOf(minValue1);  // Gets the index, which is 3 (index = 3)
+
+            // Append the index of the moved node and the closest node to the result array
+            closest_nodes.push([node1.atomNumber, catoms_orig[closest_node_idx].atomNumber, minValue1]);
+        });
+
+        updateNodesEEH3( closest_nodes, moved_nodes, removed);
+            // check if all items in removed are true then return false
+
+        if(removed.every(Boolean)){
+            return false;
+        }
+
+        for(var i=0; i<removed.length; i++) {
+            if (removed[i] == true) {
+                continue;
+            }
+            var atomNumber1 = closest_nodes[i][0];
+            var atomNumber2 = closest_nodes[i][1];
+
+            // find node1 in the catoms array
+            var node1 = moved_nodes.find(node => node.atomNumber === atomNumber1);
+            var node2 = catoms.find(catom => catom.atomNumber === atomNumber2);
+
+            // move over information from node1 to node2
+            node2["ppm"] = node1["ppm"];
+            node2["H1_ppm"] = node1["H1_ppm"];
+            node2["jCouplingVals"] = node1["jCouplingVals"];
+            node2["jCouplingClass"] = node1["jCouplingClass"];
+            node2["id"] = node1["id"];
+        }
+
+        // uddate the visible flags in the catoms array
+        for(var i=0; i<removed.length; i++) {
+            if (removed[i] == true) {
+                continue;
+            }
+            var atomNumber1 = closest_nodes[i][0];
+            // var atomNumber2 = closest_nodes[i][1];
+            // find node with atomNumber1 in the catoms array
+            var node1 = catoms.find(catom => catom.atomNumber === atomNumber1);
+            node1.visible = false;
+        }
+
+        for(var i=0; i<removed.length; i++) {
+            if (removed[i] == true) {
+                continue;
+            }
+            // var atomNumber1 = closest_nodes[i][0];
+            var atomNumber2 = closest_nodes[i][1];
+            // find node with atomNumber1 in the catoms array
+            var node1 = catoms.find(catom => catom.atomNumber === atomNumber2);
+            node1.visible = true;
+        }
+        return true;
+    }
+
+    function computeTotalWeight2D(links, mapping, shortestPaths, node_offset) {
+        let totalWeight = 0;
+
+        links.forEach(link => {
+            const u = link.source;
+            const v = link.target;
+            const d = link;
+
+            if (d.cosy || d.hmbc) {
+                const uu = mapping[u] - node_offset;
+                const vv = mapping[v] - node_offset;
+
+
+                if(uu == vv) {
+                    return;
+                }
+
+                if (d.cosy) {
+                    let weight = shortestPaths[uu][vv];
+                    // console.log(`cosy weight ${weight} ${Math.pow(weight - 1, 3)}`);
+                    totalWeight += Math.pow(weight - 1, 3);
+                }
+                if (d.hmbc) {
+                    let weight = shortestPaths[uu][vv];
+                    if (weight < 3) {
+                        weight = 2;
+                    }
+                    // console.log(`weight ${weight} ${Math.pow(weight - 2, 3)}`);
+                    totalWeight += Math.pow(weight - 2, 3);
+                }
+            }
+        });
+        return totalWeight;
+    }
+
+    function updateNodesEEH3(closest_nodes, moved_nodes, removed) {
+
+        // first check if the moved node will be going to a position that has the same number of protons
+        // if it is not, then remove the moved node from the moved_nodes array
+        // by setting the removed flag to true
+
+        for(var j=0; j<closest_nodes.length; j++) {
+            var atomNumber1 = closest_nodes[j][0];
+            var atomNumber2 = closest_nodes[j][1];
+            var minValue = closest_nodes[j][2];
+
+            // find node1 in the catoms array
+            var node1 = catoms.find(catom => catom.atomNumber === atomNumber1);
+            var node2 = catoms.find(catom => catom.atomNumber === atomNumber2);
+
+            if (node1.numProtons != node2.numProtons) {
+                removed[j] = true;
+            }
+            if (node1.atomNumber == node2.atomNumber) {
+                removed[j] = true;
+            }
+        }
+        for(var j=0; j<closest_nodes.length; j++) {
+
+            if (removed[j] == true) {
+                continue;
+            }
+            var atomNumber1 = closest_nodes[j][0];
+            var atomNumber2 = closest_nodes[j][1];
+            var minValue = closest_nodes[j][2];
+
+            // find node1 in the catoms array
+            var node1 = catoms.find(catom => catom.atomNumber === atomNumber1);
+            var node2 = catoms.find(catom => catom.atomNumber === atomNumber2);
+
+            // destination in the moved_nodes array
+            dest_found = moved_nodes.find(moved_node => moved_node.atomNumber === atomNumber2) == undefined ? false : true;
+            dest_idx = moved_nodes.findIndex(moved_node => moved_node.atomNumber === atomNumber2);
+
+            if (!dest_found) {
+                // check if the destination node is visible
+                // if it is then that means the node is being moved to a position that is free and that is allowed
+                if (node2.visible) {
+                    removed[j] = true;
+                }
+                else {
+                    removed[j] = false;
+                }
+            }
+            else {
+                // check that if the destination node has been removed or not
+                if (removed[dest_idx] == true) {
+                    removed[j] = true;
+                }
+                else {
+                    removed[j] = false;
+                }
+            }
+        }
+    }
+
+    function exportToMnova() {
+
+        console.log("exportToMnova");
+        var workingDirectory = "/opt/topspin4.5.0/examdata/exam_CMCse_1";
+        var workingFilename = "exam_CMCse_1";
+
+        // create the json filename
+        var jsonFilename = workingFilename + '_assignments_from_simplemnova.json';
+
+        // add the working directory to the jsonFilename Does not work
+        // var jsonFilename = workingDirectory + '/' + jsonFilename;
+
+        var nodes_export = JSON.parse(JSON.stringify(nodes));
+
+        nodes_export.forEach(node => {
+            node.x = xScale.invert(node.x);
+            node.y = yScale.invert(node.y);
+        });
+
+        catoms_orig.forEach(node => {
+            node.x = xScale.invert(node.x);
+            node.y = yScale.invert(node.y);
+        });
+
+        catoms.forEach(node => {
+            node.x = xScale.invert(node.x);
+            node.y = yScale.invert(node.y);
+        });
+
+        nodes_orig.forEach(node => {
+            node.x = xScale.invert(node.x);
+            node.y = yScale.invert(node.y);
+        });
+
+        var nodes_data ={};
+        nodes_data['nodes_orig'] = catoms_orig;
+        nodes_data['nodes_now'] = nodes_export;
+        nodes_data['links'] = links;
+
+        // add smilesString and molfile to the nodes_data
+        nodes_data['smilesString'] = smilesString;
+        nodes_data['molfile'] = molfile;
+
+        nodes_data['dataFrom'] = dataFrom;
+        nodes_data['oldjsondata'] = oldjsondata;
+
+        nodes_data['molgraph'] = molgraph;
+        nodes_data['shortest_paths'] = shortest_paths;
+        //  get the contents of the svg element convert to string
+        nodes_data['svg'] = svg_bckgrnd_image_str;
+
+
+
+        nodes_data['catoms'] = catoms;
+        nodes_data['catoms_orig'] = catoms_orig;
+        nodes_data['best_results'] = best_results;
+        nodes_data['workingDirectory'] = workingDirectory;
+        nodes_data['workingFilename'] = workingFilename;
+        nodes_data['title'] = title;
+
+
+        // save the json string to a file
+        var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(nodes_data, null, 2));
+        var a = document.createElement('a');
+        a.href = 'data:' + data;
+        a.download = jsonFilename;
+        a.innerHTML = 'download JSON';
+        a.click();
+
+        // Scale nodes back again
+        catoms_orig.forEach(node => {
+            node.x = xScale(node.x);
+            node.y = yScale(node.y);
+        });
+
+        catoms.forEach(node => {
+            node.x = xScale(node.x);
+            node.y = yScale(node.y);
+        });
+    }
+
+
+    function publish() {
+        console.log('Publishing');
+    }
+
+    function savehtmpage(){
+        console.log('Saving HTML page');
+    }
+
+    const cosybutton = document.getElementById('sunkenButton');
+
+    // Toggle between 'sunken' and 'normal' styles when clicked
+    let linksVisible = true;
+    cosybutton.addEventListener('click', function() {
+        cosybutton.classList.toggle('sunken');
+
+        if (linksVisible) {
+            d3.selectAll(".cosy-link").style("display", "none");
+            // this.textContent = "Show Links";
+        } else {
+            d3.selectAll(".cosy-link").style("display", "inline");
+            // this.textContent = "Hide Links";
+        }
+        linksVisible = !linksVisible;
+    });
+
+
+
+
+    // Toggle code
+    const hmbcbutton = document.getElementById('hmbcButton');
+    let hmbcVisible = false;
+
+    function toggleHmbcVisibility() {
+        hmbcbutton.classList.toggle('sunken');
+        hmbcVisible = !hmbcVisible;
+        
+        if (hmbcVisible) {
+            // Show all HMBC edges with opacity
+            d3.selectAll(".hmbc-link").attr("opacity", 1);
+            console.log("HMBC links visible:", hmbcVisible);
+            // If the cosy button is not sunken, set the opacity of the cosy links to 0
+            if (!d3.select("#sunkenButton").classed("sunken")) {
+                console.log("COSY button not sunken");
+                // change the opacity of the cosy links to 0
+                link.style("opacity", 0);
+            }
+        } else {
+            // Hide all HMBC edges with opacity
+            d3.selectAll(".hmbc-link").attr("opacity", 0);
+            console.log("HMBC links hidden:", !hmbcVisible);
+            // If the cosy button is not sunken, set the opacity of the cosy links to 1
+            if (!d3.select("#sunkenButton").classed("sunken")) {
+                console.log("COSY button not sunken");
+                // change the opacity of the cosy links to 1
+                link.style("opacity", 1);       
+            }
+        }
+    }
+
+
+    hmbcbutton.addEventListener('click', toggleHmbcVisibility);
+
+    const infobutton = document.getElementById('infoButton');
+
+    // Toggle between 'sunken' and 'normal' styles when clicked
+    let laeVisible = true;
+    infobutton.addEventListener('click', function() {
+        infobutton.classList.toggle('sunken');
+
+        if (d3.select("#infoButton").classed("sunken")){
+            console.log("sunken");
+            laeVisible = true;
+        }
+        else {
+            laeVisible = false;
+            console.log("not sunken");
+        }
+
+        // check if infoButton is sunken
+        
+
+        if (laeVisible) {
+            // select all the nodes where abs(ppm - ppm_calculated) is greater than 10ppm
+            // and set the edge node color to red
+
+
+            // Assuming allnodes is already defined as in your code
+            allnodes.each(function(d) {
+                // 'this' refers to the current DOM element
+                const ppm = d.ppm;
+                const ppm_calculated = d.ppm_calculated;
+                if (Math.abs(ppm - ppm_calculated) > 10) {
+                    d3.select(this).select("circle").style("fill", "pink");
+                }
+            });
+
+            // set the best lae node to red using the atomNumber and lae_best_atomNumber
+
+            allnodes.each(function(d) {
+                // 'this' refers to the current DOM element
+                // const atomNumber = d3.select(this).attr("atomNumber");
+                const atomNumber = d.atomNumber;
+                if (atomNumber == best_results.best_lae_atomNumber) {
+                    d3.select(this).select("circle").style("fill", "red");
+                }
+            });
+
+        } else {
+
+            // Assuming allnodes is already defined as in your code
+            allnodes.each(function(d) {
+                const numProtons = d.numProtons;
+                // Select the circle within the current node group and reset its fill color
+                d3.select(this).select("circle").style("fill", colorScale(numProtons));
+            });
+
+        }
+        laeVisible = !laeVisible;
+    });
+
+    let scaleLevel = 1;
+
+  </script>
+</body>
+</html>

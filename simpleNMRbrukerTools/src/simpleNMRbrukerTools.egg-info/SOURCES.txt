@@ -1,0 +1,26 @@
+README.md
+pyproject.toml
+src/simpleNMRbrukerTools/__init__.py
+src/simpleNMRbrukerTools/cli.py
+src/simpleNMRbrukerTools/config.py
+src/simpleNMRbrukerTools.egg-info/PKG-INFO
+src/simpleNMRbrukerTools.egg-info/SOURCES.txt
+src/simpleNMRbrukerTools.egg-info/dependency_links.txt
+src/simpleNMRbrukerTools.egg-info/entry_points.txt
+src/simpleNMRbrukerTools.egg-info/requires.txt
+src/simpleNMRbrukerTools.egg-info/top_level.txt
+src/simpleNMRbrukerTools/core/__init__.py
+src/simpleNMRbrukerTools/core/data_reader.py
+src/simpleNMRbrukerTools/core/json_converter-DA-FVFHG71LQ05D (2052).py
+src/simpleNMRbrukerTools/core/json_converter.py
+src/simpleNMRbrukerTools/gui/__init__.py
+src/simpleNMRbrukerTools/gui/guidataWarningDialogs.py
+src/simpleNMRbrukerTools/parsers/__init__.py
+src/simpleNMRbrukerTools/parsers/integral_parser.py
+src/simpleNMRbrukerTools/parsers/parameter_parser.py
+src/simpleNMRbrukerTools/parsers/peak_parser.py
+src/simpleNMRbrukerTools/topspin_programs/__init__.py
+src/simpleNMRbrukerTools/topspin_programs/simpleNMRbruker.py
+src/simpleNMRbrukerTools/utils/__init__.py
+tests/test_json_converter.py
+tests/test_parameter_parser.py

@@ -1,0 +1,11 @@
+numpy>=1.20.0
+pandas>=1.5.0
+pathlib-mate>=1.0.0
+requests>=2.25.0
+rdkit>=2022.9.1
+guidata>=2.0.0
+
+[test]
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.0.0

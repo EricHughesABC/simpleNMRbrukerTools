@@ -1,0 +1,4 @@
+[console_scripts]
+setup-topspin = simpleNMRbrukerTools.cli:setup_topspin
+topspin-info = simpleNMRbrukerTools.cli:show_info
+uninstall-topspin = simpleNMRbrukerTools.cli:uninstall_topspin

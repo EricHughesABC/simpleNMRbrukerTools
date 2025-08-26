@@ -1,0 +1,3 @@
+# flowbar definitions
+USERTAB_simpleNMR_1D=\
+NM=, TXT=simpleNMR, CMD=xpy3 simpleNMRbruker.py, TIP=simpleNMR_TOOLTIP, END=
