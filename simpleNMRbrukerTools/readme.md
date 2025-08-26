@@ -1,53 +1,22 @@
+This set of tools can be installed into a local/bruker distibution of python using pip
 
-## Key Improvements Made
+These instructions assume that you have installed python 3 for topspin4.5.0 and also installed the Bruker-Topspin python utilities outlined int the Bruker python3/Jupyter tutorial.
 
-### 1. **Simplified Architecture**
-- Separated concerns into logical modules
-- Created clear interfaces between components
-- Reduced complexity in main classes
+Ensure that you are using the python3 Bruker/Topspin environment when using pip
 
-### 2. **Better Error Handling**
-- Added proper exception handling
-- Meaningful error messages
-- Graceful degradation for missing files
+Download the simpleNMRbrukerTools repository from GitHub
 
-### 3. **Comprehensive Documentation**
-- Detailed docstrings for all classes and methods
-- Type hints throughout
-- Clear parameter descriptions
+Open a terminal and activate the Bruker/Topsin Python3 environment.
 
-### 4. **Robust Testing**
-- Unit tests for individual components
-- Integration tests for workflow
-- Mock data for reliable testing
-- Good test coverage
+change folders to the first simpleNMRbrukerTools folder and then type
 
-### 5. **Configuration Management**
-- Separated experiment configurations
-- Easy to extend with new experiment types
-- Centralized settings
+pip install simpleNMRBrukerTools
 
-### 6. **Code Quality**
-- Consistent naming conventions
-- Reduced code duplication
-- Better separation of concerns
-- Type safety with hints
+If it has installed correctly type the following command to install the python main program into the python 3 user directory and install files to install the simpleNMRbrukerTools onto the Topspin flowbar menu interface
 
-## Usage Examples
+Make sure Topspin is running then type in the terminal window
 
-### Basic Usage
-```python
-from bruker_nmr.src.core.data_reader import BrukerDataDirectory
-from bruker_nmr.src.core.json_converter import BrukerToJSONConverter
-from bruker_nmr.src.config import EXPERIMENT_CONFIGS
+setup-topsin
 
-# Read Bruker data
-data_dir = "/path/to/bruker/data"
-reader = BrukerDataDirectory(data_dir, EXPERIMENT_CONFIGS)
+In Topspin,  right click on the flowbar menu
 
-# Convert to JSON
-converter = BrukerToJSONConverter(data_dir)
-user_selections = {
-    "10": {"experimentType": "H1_1D", "procno": "1"}
-}
-json_data = converter.convert_to_json(user_selections)
