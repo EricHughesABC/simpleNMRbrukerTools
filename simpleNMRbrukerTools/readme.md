@@ -80,12 +80,14 @@ After successful configuration, you should see:
 For issues and questions:
 - Check the [Issues](https://github.com/EricHughesABC/simpleNMRbrukerTools/issues) page
 - Refer to the Bruker Python3/Jupyter tutorial documentation
+- Send an email to simpleNMR@gmail.com for direct assistance
 
 ## License
 
-[Add your license information here]
+This project falls under the MIT license.
 
 ## Contributing
 
-[Add contribution guidelines here]
+If you are interested in helping please get in touch. Fork the project and submit an update. If you have comments or suggestions get in touch via email simpleNMR@gmail.com
+
 
