@@ -1,22 +1,90 @@
-This set of tools can be installed into a local/bruker distibution of python using pip
+# simpleNMRbrukerTools
 
-These instructions assume that you have installed python 3 for topspin4.5.0 and also installed the Bruker-Topspin python utilities outlined int the Bruker python3/Jupyter tutorial.
+A set of Python tools to use simpleNMR under Bruker NMR TopSpin.
 
-Ensure that you are using the python3 Bruker/Topspin environment when using pip
+## Prerequisites
 
-Download the simpleNMRbrukerTools repository from GitHub
+Before installing simpleNMRbrukerTools, ensure you have:
 
-Open a terminal and activate the Bruker/Topsin Python3 environment.
+- **Python 3** installed for TopSpin 4.5.0
+- **Bruker-TopSpin Python utilities** installed (follow the Bruker Python3/Jupyter tutorial)
+- Access to the Bruker/TopSpin Python3 environment
 
-change folders to the first simpleNMRbrukerTools folder and then type
+## Installation
 
-pip install simpleNMRBrukerTools
+### 1. Download the Repository
 
-If it has installed correctly type the following command to install the python main program into the python 3 user directory and install files to install the simpleNMRbrukerTools onto the Topspin flowbar menu interface
+Clone or download the `simpleNMRbrukerTools` repository from GitHub:
 
-Make sure Topspin is running then type in the terminal window
+```bash
+git clone https://github.com/erichughesABC/simpleNMRbrukerTools.git
+```
 
-setup-topsin
+### 2. Install the Package
 
-In Topspin,  right click on the flowbar menu
+1. **Open a terminal** and activate the Bruker/TopSpin Python3 environment
+2. **Navigate** to the `simpleNMRbrukerTools` directory:
+   ```bash
+   cd simpleNMRbrukerTools
+   ```
+3. **Install** using pip:
+   ```bash
+   pip install simpleNMRBrukerTools
+   ```
 
+### 3. Setup TopSpin Integration
+
+1. **Ensure TopSpin is running**
+2. **Run the setup command** in your terminal:
+   ```bash
+   setup-topspin
+   ```
+
+This installs the main program into the Python 3 Topspin user directory and installs the TopSpin flowbar integration files.
+
+## TopSpin Flowbar Configuration
+
+### Add simpleNMR Tab to Flowbar
+
+1. **Right-click** on the TopSpin flowbar menu:
+
+   ![Right click on flowbar](docs/images/addNewTab.png "Add new simpleNMR tab to Flowbar menu system")
+
+2. **Fill in the dialog** that appears:
+
+   ![Empty flowbar dialog](docs/images/userDefinedTab_empty.png "Flowbar dialog")
+
+3. **Complete the dialog** with the required parameters and click **OK**:
+
+   ![Complete flowbar dialog](docs/images/userDefinedTab_completed.png "Completed Flowbar dialog")
+
+### Verification
+
+After successful configuration, you should see:
+
+- The new **simpleNMR menu item** in the Flowbar menu system
+- A **button to start simpleNMR** directly from TopSpin
+
+![simpleNMR installed in Topspin](docs/images/simpleNMRinstalledFlowbar.png "simpleNMR installed in Topspin")
+
+## Troubleshooting
+
+### Common Issues
+
+- **Installation fails**: Verify you're using the correct Bruker/TopSpin Python3 environment
+- **setup-topspin command not found**: Ensure the package installed correctly with `pip list | grep simpleNMRbrukerTools`
+- **Flowbar integration not working**: Make sure TopSpin is running before executing `setup-topspin`
+
+## Support
+
+For issues and questions:
+- Check the [Issues](https://github.com/your-username/simpleNMRbrukerTools/issues) page
+- Refer to the Bruker Python3/Jupyter tutorial documentation
+
+## License
+
+[Add your license information here]
+
+## Contributing
+
+[Add contribution guidelines here]
