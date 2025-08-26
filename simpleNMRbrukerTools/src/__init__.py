@@ -25,11 +25,18 @@ try:
 except ImportError:
     pass
 
+try:
+    from topspin_interface import *
+except ImportError:
+    pass
+
 # Also make submodules available
 try:
     from . import core
     from . import gui
     from . import parsers  
     from . import utils
+    from . import topspin_interface
 except ImportError:
+
     pass
