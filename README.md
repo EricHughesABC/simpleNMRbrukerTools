@@ -48,15 +48,15 @@ This installs the main program into the Python 3 Topspin user directory and inst
 
 1. **Right-click** on the TopSpin flowbar menu:
 
-   ![Right click on flowbar](docs/images/addNewTab.png "Add new simpleNMR tab to Flowbar menu system")
+   ![Right click on flowbar](simpleNMRbrukerTools/docs/images/addNewTab.png "Add new simpleNMR tab to Flowbar menu system")
 
 2. **Fill in the dialog** that appears:
 
-   ![Empty flowbar dialog](docs/images/userDefinedTab_empty.png "Flowbar dialog")
+   ![Empty flowbar dialog](simpleNMRbrukerTools/docs/images/userDefinedTab_empty.png "Flowbar dialog")
 
 3. **Complete the dialog** with the required parameters and click **OK**:
 
-   ![Complete flowbar dialog](docs/images/userDefinedTab_completed.png "Completed Flowbar dialog")
+   ![Complete flowbar dialog](simpleNMRbrukerTools/docs/images/userDefinedTab_completed.png "Completed Flowbar dialog")
 
 ### Verification
 
@@ -65,7 +65,7 @@ After successful configuration, you should see:
 - The new **simpleNMR menu item** in the Flowbar menu system
 - A **button to start simpleNMR** directly from TopSpin
 
-![simpleNMR installed in Topspin](docs/images/simpleNMRinstalledFlowbar.png "simpleNMR installed in Topspin")
+![simpleNMR installed in Topspin](simpleNMRbrukerTools/docs/images/simpleNMRinstalledFlowbar.png "simpleNMR installed in Topspin")
 
 ## Troubleshooting
 
