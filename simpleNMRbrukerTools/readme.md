@@ -1,6 +1,6 @@
 # simpleNMRbrukerTools
 
-A set of Python tools to use simpleNMR under Bruker NMR TopSpin.
+A set of Python tools to use simpleNMR under Bruker NMR TopSpin (>= 4.5.0).
 
 ## Prerequisites
 
@@ -89,5 +89,6 @@ This project falls under the MIT license.
 ## Contributing
 
 If you are interested in helping please get in touch. Fork the project and submit an update. If you have comments or suggestions get in touch via email simpleNMR@gmail.com
+
 
 
