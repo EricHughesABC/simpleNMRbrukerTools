@@ -37,10 +37,7 @@ test = [
     "pytest-mock>=3.0.0",
 ]
 
-[project.scripts]
-setup-topspin = "simpleNMRbrukerTools.cli:setup_topspin"
-uninstall-topspin = "simpleNMRbrukerTools.cli:uninstall_topspin"
-topspin-info = "simpleNMRbrukerTools.cli:show_info"
+
 
 [project.scripts]
 setup-topspin = "simpleNMRbrukerTools.cli:setup_topspin"
