@@ -56,6 +56,9 @@ include = ["simpleNMRbrukerTool*"]
 [tool.setuptools.package-dir]
 "" = "src"
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
