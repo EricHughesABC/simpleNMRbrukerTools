@@ -97,7 +97,7 @@ def create_processing_dialog(experiments_with_peaks: Dict[str, List], converter)
         DataSet class for the processing dialog
     """
     class Processing(gds.DataSet):
-        """Example"""
+        """Choose Spectra"""
         
         _experiment_choices = {}
         
@@ -326,16 +326,38 @@ def submit_to_server(json_data: Dict) -> bool:
         print(f"Server response: {response.status_code}")
         
         if response.status_code == 200:
+
+            # replace dummy_title in response.txt with working_filename from json_data
+            workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
+            print(f"Working filename: {workingFilename}")
+            response_text = response.text
+            print(f"Response text length: {type(response_text)}")
+            response_text = response_text.replace("dummy_title", workingFilename)
+            print("subtituted for dummy_title")
             # Save response to file
-            with open('nmr_analysis_result.html', 'w', encoding='utf-8') as f:
-                f.write(response.text)
-            
-            print("Analysis complete! Results saved to 'nmr_analysis_result.html'")
-            
+            fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
+
+
+            fn_path = Path(fn_str, "html")
+
+            print(f"Working directory: {fn_path}, Exists = {fn_path.exists()}")
+
+
+            if not fn_path.exists():
+                fn_path.mkdir(parents=True, exist_ok=True)
+
+            # add filename to path
+            fn_path = Path(fn_path, workingFilename + ".html")
+
+            print(f"Saving results to: {fn_path}")
+            with open(fn_path, 'w', encoding='utf-8') as f:
+                f.write(response_text)
+
+            print(f"Analysis complete! Results saved to '{fn_path}'")
+
             # Open in browser
-            result_path = Path('nmr_analysis_result.html').absolute()
-            webbrowser.open(f'file://{result_path}')
-            
+            webbrowser.open(f'file://{fn_path}')
+
             return True
         else:
             print(f"Server error: {response.status_code} - {response.text}")
