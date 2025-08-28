@@ -7,35 +7,38 @@ A set of Python tools to use simpleNMR under Bruker NMR TopSpin (>= 4.5.0).
 Before installing simpleNMRbrukerTools, ensure you have:
 
 - **Python 3** installed for TopSpin 4.5.0
-- **Bruker-TopSpin Python utilities** installed (follow the Bruker Python3/Jupyter tutorial)
+- **Bruker-TopSpin Python libraries* installed (follow the Bruker Python 3 API inJupyter notebook PDF)
 - Access to the Bruker/TopSpin Python3 environment
+
 
 ## Installation
 
 ### 1. Download the Repository
 
-Clone or download the `simpleNMRbrukerTools` repository from GitHub:
+1. **Open a terminal** and activate the Bruker/TopSpin Python3 environment
+
+2. Clone or download the `simpleNMRbrukerTools` repository from GitHub by copying the command below and running it in the the terminal window at a suitable directory location  on your hardrive:
 
 ```bash
 git clone https://github.com/EricHughesABC/simpleNMRbrukerTools.git
 ```
 
-### 2. Install the Package
+### 2. Install the Package into the Topspin Python 3 site-packages folder
 
-1. **Open a terminal** and activate the Bruker/TopSpin Python3 environment
-2. **Navigate** to the top `simpleNMRbrukerTools` directory:
+1. Again, if not already dons so, **Open a terminal** and activate the Bruker/TopSpin Python3 environment
+2. **Navigate** to the `simpleNMRbrukerTools/simpleNMRbrukerTools` folder:
    ```bash
-   cd simpleNMRbrukerTools
+   cd simpleNMRbrukerTools/simpleNMRbrukerTools
    ```
 3. **Install** using pip:
    ```bash
-   pip install simpleNMRbrukerTools
+   pip install .
    ```
 
 ### 3. Setup TopSpin Integration
 
 1. **Ensure TopSpin is running**
-2. **Run the setup command** in your terminal:
+2. **Run the topspin setup command** in your terminal:
    ```bash
    setup-topspin
    ```
@@ -46,17 +49,19 @@ This installs the main program into the Python 3 Topspin user directory and inst
 
 ### Add simpleNMR Tab to Flowbar
 
-1. **Right-click** on the TopSpin flowbar menu:
+1. **Right-click** on the TopSpin flowbar menu to add an new tab:
 
-   ![Right click on flowbar](simpleNMRbrukerTools/docs/images/addNewTab.png "Add new simpleNMR tab to Flowbar menu system")
+   ![Right click on flowbar](docs/images/addNewTab.png "Add new simpleNMR tab to Flowbar menu system")
 
-2. **Fill in the dialog** that appears:
+2. **Fill in the empty dialog** that appears:
 
-   ![Empty flowbar dialog](simpleNMRbrukerTools/docs/images/userDefinedTab_empty.png "Flowbar dialog")
+   ![Empty flowbar dialog](docs/images/userDefinedTab_empty.png "Flowbar dialog")
 
 3. **Complete the dialog** with the required parameters and click **OK**:
 
-   ![Complete flowbar dialog](simpleNMRbrukerTools/docs/images/userDefinedTab_completed.png "Completed Flowbar dialog")
+   ![Complete flowbar dialog](docs/images/userDefinedTab_completed.png "Completed Flowbar dialog")
+
+4. Topspin may need to be restarted to complete the installation.
 
 ### Verification
 
@@ -65,25 +70,11 @@ After successful configuration, you should see:
 - The new **simpleNMR menu item** in the Flowbar menu system
 - A **button to start simpleNMR** directly from TopSpin
 
-![simpleNMR installed in Topspin](simpleNMRbrukerTools/docs/images/simpleNMRinstalledFlowbar.png "simpleNMR installed in Topspin")
+![simpleNMR installed in Topspin](docs/images/simpleNMRinstalledFlowbar.png "simpleNMR installed in Topspin")
 
 
 
-## Example Bruker Data Set (already peak picked)
 
-Due to GitHub's 100MB file size limit, the following files are hosted on Google Drive:
-
-| File | Description | Size | Link |
-|------|-------------|------|------|
-| `exam_CMCse_1.zip` | Bruker Topspin dataset | 60MB | [Download](https://drive.google.com/uc?export=download&id=1Qdi8NzqOBgqj5Cu3x1Hpk71WnJpAtZz2) |
-
-
-
-### Usage
-```bash
-# Download the files to your project directory
-wget "https://drive.google.com/uc?export=download&id=1Qdi8NzqOBgqj5Cu3x1Hpk71WnJpAtZz2" -O exam_CMCse_1.zip
-```
 
 ## Troubleshooting
 
