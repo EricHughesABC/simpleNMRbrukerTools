@@ -27,7 +27,8 @@ dependencies = [
     "pathlib-mate>=1.0.0",
     "requests>=2.25.0",
     "rdkit>=2022.9.1",
-    "guidata>=2.0.0"
+    "guidata>=2.0.0",
+    "PyQt5>=5.15.0",
 ]
 
 [project.optional-dependencies]
