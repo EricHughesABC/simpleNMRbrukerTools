@@ -32,15 +32,15 @@ The following experiments should be properly processed before analysis:
 
 | Experiment | Requirements | Notes |
 |------------|-------------|--------|
-| **HSQC** | Peak picking + integration | **Required** - Must be multiplicity-edited |
+| **HSQC** | Peak picking + integration | **Required** - multiplicity-edited<sup>*</sup> |
 | **HMBC** | Peak picking only | Optional but recommended |
 | **COSY** | Peak picking only | Optional but recommended |
-| **1D ¹³C** | Peak picking only | Optional - include if consistent referencing |
+| **1D ¹³C** | Peak picking only | Optional - include to make analysis simpler |
 
 #### Additional Considerations
-- **DEPT-135:** Required if HSQC is not multiplicity-edited
-- **1D ¹H spectra:** Generally excluded from complex systems but useful for 2D peak centering
-- **Pure shift data:** Best excluded from automated analysis
+- **<sup>*</sup>DEPT-135:** Required if HSQC is not multiplicity-edited
+- **1D ¹H spectra:** Generally excluded from complex systems 
+- **Pure shift data:** Useful for 2D peak picking  analysis
 
 ### 3. Data Quality Guidelines
 
@@ -59,7 +59,7 @@ The following experiments should be properly processed before analysis:
 
 ### Step 1: Launch simpleNMR
 
-1. Open a processed dataset in TopSpin
+1. Open a processed peak-picked dataset in TopSpin
 2. Click the **simpleNMR** button in the flowbar menu
 3. Wait patiently during initial startup (may take 30+ seconds on first use)
 
@@ -104,7 +104,6 @@ Upon successful completion, results open automatically in your default web brows
 The results page provides:
 - **Assignment proposals** with confidence scores
 - **Interactive molecular structure** with clickable assignments
-- **Spectral correlation tables** showing supporting evidence
 - **Export options** for further analysis
 
 ## Troubleshooting
@@ -126,4 +125,4 @@ The results page provides:
 For technical issues or questions about simpleNMR analysis, consult:
 - TopSpin documentation for peak picking procedures
 - simpleNMR online resources for interpretation guidance
-- Local NMR facility staff for spectroscopic advice
+- request help via email at simpleNMR@gmail.com
