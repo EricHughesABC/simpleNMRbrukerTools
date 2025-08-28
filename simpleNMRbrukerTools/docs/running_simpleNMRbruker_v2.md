@@ -63,31 +63,42 @@ The following experiments should be properly processed before analysis:
 2. Click the **simpleNMR** button in the flowbar menu
 3. Wait patiently during initial startup (may take 30+ seconds on first use)
 
-### Step 2: Select Data Directory
+### Step 2: Initial Registration of Host Computer
+
+1. The first time simpleNMR is used the user will be asked to register their email and computer ID.
+2. If the user uses a different computer then they will be asked again to register
+3. The default settings for the server is that no user data is saved on the server unless authorized by the user.
+4. If the user agrees with the registration criteria then the user has to click on the simpleNMR button again to continue the analysis.
+
+![Registration Form](images/HostRegistration.png)  
+
+**Figure 3:** Resgistration webpage
+
+### Step 3: Select Data Directory
 
 The directory selection dialog will automatically open to your current TopSpin dataset location:
 
 ![Directory selection](images/DirectoryDialog.png)
 
-**Figure 3:** Automatic directory selection dialog
+**Figure 4:** Automatic directory selection dialog
 
 - Click **OK** if the displayed directory is correct
 - Use the folder icon to browse to a different directory if needed
 
-### Step 3: Choose Experiments
+### Step 5: Choose Experiments
 
 Select which experiments to include in the analysis. Only datasets with existing peak lists will be displayed:
 
 ![Experiment selection](images/ChooseExperiment.png)
 
-**Figure 4:** Experiment selection dialog showing available peak-picked datasets
+**Figure 5:** Experiment selection dialog showing available peak-picked datasets
 
 **Tips:**
 - Set unwanted experiments to **SKIP** to exclude them
 - Include all relevant 2D experiments for best results
 - Consider excluding 1D proton data in complex systems
 
-### Step 4: Submit and Wait
+### Step 6: Submit and Wait
 
 - Click to submit your data for analysis
 - **Processing time:** 30-45 seconds (no progress indicator available)
@@ -99,7 +110,7 @@ Upon successful completion, results open automatically in your default web brows
 
 ![Results display](images/simpleNMRresults.png)
 
-**Figure 5:** Interactive simpleNMR results displayed in web browser
+**Figure 6:** Interactive simpleNMR results displayed in web browser
 
 The results page provides:
 - **Assignment proposals** with confidence scores
@@ -125,4 +136,4 @@ The results page provides:
 For technical issues or questions about simpleNMR analysis, consult:
 - TopSpin documentation for peak picking procedures
 - simpleNMR online resources for interpretation guidance
-- request help via email at simpleNMR@gmail.com
+- request help via email at simpleNMR@gmailng
