@@ -22,6 +22,9 @@ import requests
 import webbrowser
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+import threading
+from qtpy.QtWidgets import QProgressDialog, QApplication, QMessageBox
+from qtpy.QtCore import Qt
 
 from bruker.api.topspin import Topspin
 from bruker.data.nmr import *
@@ -370,7 +373,125 @@ def submit_to_server(json_data: Dict) -> bool:
         print(f"Error submitting to server: {e}")
         return False
 
+# import threading
+# import webbrowser
+# from pathlib import Path
+# from typing import Dict
+# import requests
+# from qtpy.QtWidgets import QProgressDialog, QApplication, QMessageBox
+# from qtpy.QtCore import Qt
 
+def submit_to_server(json_data: Dict) -> bool:
+    """
+    Submit the JSON data to the processing server with progress dialog.
+    
+    Args:
+        json_data: The converted JSON data
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    
+    # Create progress dialog
+    progress = QProgressDialog("Submitting data to processing server...", "Cancel", 0, 0)
+    progress.setWindowModality(Qt.WindowModal)
+    progress.setMinimumDuration(0)
+    progress.setCancelButton(None)  # Remove cancel button since we can't easily cancel the request
+    progress.show()
+    
+    # Variables to store result
+    result = {'success': False, 'error': None, 'finished': False}
+    
+    def make_request():
+        try:
+            print("Submitting data to processing server...")
+            
+            response = requests.post(
+                'https://test-simplenmr.pythonanywhere.com/simpleMNOVA',
+                headers={'Content-Type': 'application/json'},
+                json=json_data,
+                timeout=100
+            )
+            
+            print(f"Server response: {response.status_code}")
+            
+            if response.status_code == 200:
+                # replace dummy_title in response.txt with working_filename from json_data
+                workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
+                print(f"Working filename: {workingFilename}")
+                response_text = response.text
+                print(f"Response text length: {type(response_text)}")
+                response_text = response_text.replace("dummy_title", workingFilename)
+                print("subtituted for dummy_title")
+                
+                # Save response to file
+                fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
+                fn_path = Path(fn_str, "html")
+
+                print(f"Working directory: {fn_path}, Exists = {fn_path.exists()}")
+
+                if not fn_path.exists():
+                    fn_path.mkdir(parents=True, exist_ok=True)
+
+                # add filename to path
+                fn_path = Path(fn_path, workingFilename + ".html")
+
+                print(f"Saving results to: {fn_path}")
+                with open(fn_path, 'w', encoding='utf-8') as f:
+                    f.write(response_text)
+
+                print(f"Analysis complete! Results saved to '{fn_path}'")
+
+                # Open in browser
+                webbrowser.open(f'file://{fn_path}')
+
+                result['success'] = True
+            else:
+                error_msg = f"Server error: {response.status_code} - {response.text}"
+                print(error_msg)
+                result['error'] = error_msg
+                
+        except requests.RequestException as e:
+            error_msg = f"Network error: {e}"
+            print(error_msg)
+            result['error'] = error_msg
+        except Exception as e:
+            error_msg = f"Error submitting to server: {e}"
+            print(error_msg)
+            result['error'] = error_msg
+        finally:
+            result['finished'] = True
+    
+    # Start request in background thread
+    thread = threading.Thread(target=make_request)
+    thread.daemon = True
+    thread.start()
+    
+    # Process events until request is complete
+    while not result['finished']:
+        QApplication.processEvents()
+        thread.join(0.1)  # Check every 100ms
+        
+        # Update progress dialog text periodically to show it's still working
+        if progress.value() % 10 == 0:  # Every ~1 second
+            progress.setLabelText("Submitting data to simpleNMR server...")
+    
+    progress.close()
+    
+    # Handle the result
+    if result['error']:
+        # Show error dialog
+        QMessageBox.critical(None, "Submission Error", 
+                           f"Failed to submit data to server:\n{result['error']}")
+        return False
+    
+    if result['success']:
+        # Show success message
+        # QMessageBox.information(None, "Success", 
+        #                       "Analysis complete! Results have been saved and opened in your browser.")
+        print("Analysis complete! Results have been saved and opened in your browser.")
+
+    return result['success']
 
 
 def get_bruker_root_folder_from_identifier(path):
@@ -581,6 +702,12 @@ def main():
         myGUIDATAwarn("Server submission failed, but JSON file was saved locally.\nYou can manually submit the file.")
         return
     
+    # success = submit_to_server(your_json_data)
+    # if success:
+    #     print("Submission completed successfully")
+    # else:
+    #     print("Submission failed")
+
     print("\n" + "=" * 60)
     print("Processing Complete!")
     print("=" * 60)
