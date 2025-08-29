@@ -683,7 +683,7 @@ def main():
         return
     
     # Step 7: Save JSON file locally
-    output_filename = f"{converter.data_directory.name}_assignments.json"
+    output_filename = Path(converter.data_directory, f"{converter.data_directory.name}_assignments.json")
     try:
         converter.save_json(output_filename)
         print(f"JSON file saved: {output_filename}")
