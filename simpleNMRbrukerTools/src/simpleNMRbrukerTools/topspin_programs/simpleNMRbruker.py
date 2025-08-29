@@ -317,7 +317,7 @@ def submit_to_server(json_data: Dict) -> bool:
         True if successful, False otherwise
     """
     try:
-        print("Submitting data to processing server...")
+        print("Submitting data to simpleNMR server...")
         
         response = requests.post(
             'https://test-simplenmr.pythonanywhere.com/simpleMNOVA',
@@ -370,7 +370,7 @@ def submit_to_server(json_data: Dict) -> bool:
         print(f"Network error: {e}")
         return False
     except Exception as e:
-        print(f"Error submitting to server: {e}")
+        print(f"Error submitting to simpleNMR server: {e}")
         return False
 
 # import threading
@@ -393,7 +393,7 @@ def submit_to_server(json_data: Dict) -> bool:
     """
     
     # Create progress dialog
-    progress = QProgressDialog("Submitting data to processing server...", "Cancel", 0, 0)
+    progress = QProgressDialog("Submitting data to simpleNMR server...", "Cancel", 0, 0)
     progress.setWindowModality(Qt.WindowModal)
     progress.setMinimumDuration(0)
     progress.setCancelButton(None)  # Remove cancel button since we can't easily cancel the request
@@ -404,7 +404,7 @@ def submit_to_server(json_data: Dict) -> bool:
     
     def make_request():
         try:
-            print("Submitting data to processing server...")
+            print("Submitting data to simpleNMR server...")
             
             response = requests.post(
                 'https://test-simplenmr.pythonanywhere.com/simpleMNOVA',
@@ -456,7 +456,7 @@ def submit_to_server(json_data: Dict) -> bool:
             print(error_msg)
             result['error'] = error_msg
         except Exception as e:
-            error_msg = f"Error submitting to server: {e}"
+            error_msg = f"Error submitting to simpleNMR server: {e}"
             print(error_msg)
             result['error'] = error_msg
         finally:
@@ -693,7 +693,7 @@ def main():
         return
     
     # Step 8: Submit to server for analysis
-    print("\n7. Submitting to Analysis Server...")
+    print("\n7. Submitting to simpleNMR Server...")
     if submit_to_server(json_data):
         print("Analysis complete! Check the opened browser window for results.")
     else:
