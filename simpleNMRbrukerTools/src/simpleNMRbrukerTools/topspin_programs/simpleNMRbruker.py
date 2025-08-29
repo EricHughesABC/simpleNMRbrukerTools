@@ -83,7 +83,7 @@ def create_processing_class(expt_pdata_with_peaks, converter):
             expts[f"expt_{expt_id}"] = (gdi.ChoiceItem(f"{expt_id} {experiment_type}", procnumbers))
             locals()[f"expt_{expt_id}"] = expts[f"expt_{expt_id}"]
 
-        simulated_annealing = gdi.BoolItem("Use simulated annealing", default=True)
+        simulated_annealing = gdi.BoolItem("Optimize Correlations", default=True)
         ml_consent = gdi.BoolItem("Permit Data to be saved to build Database", default=False)
     
     return Processing
