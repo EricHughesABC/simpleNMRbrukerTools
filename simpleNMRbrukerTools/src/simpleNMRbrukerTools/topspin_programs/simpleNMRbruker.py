@@ -64,29 +64,29 @@ class BrukerFolderDialog(DataSet):
     bruker_folder = DirectoryItem("Bruker Data Folder", default=".")
 
 
-def create_processing_class(expt_pdata_with_peaks, converter):
-    class Processing(gds.DataSet):
-        """Example"""
+# def create_processing_class(expt_pdata_with_peaks, converter):
+#     class Processing(gds.DataSet):
+#         """Example"""
         
-        expts = {}
+#         expts = {}
         
-        for expt_id, proc_files in expt_pdata_with_peaks.items():
-            expt_data = converter.bruker_data[expt_id]
-            experiment_type = expt_data.get('experimentType', 'Unknown')
-            if experiment_type == "Unknown":
-                continue
+#         for expt_id, proc_files in expt_pdata_with_peaks.items():
+#             expt_data = converter.bruker_data[expt_id]
+#             experiment_type = expt_data.get('experimentType', 'Unknown')
+#             if experiment_type == "Unknown":
+#                 continue
             
-            procnumbers = [proc_file.name for proc_file in proc_files]
-            procnumbers.append("SKIP")
-            print(expt_id, procnumbers)
+#             procnumbers = [proc_file.name for proc_file in proc_files]
+#             procnumbers.append("SKIP")
+#             print(expt_id, procnumbers)
             
-            expts[f"expt_{expt_id}"] = (gdi.ChoiceItem(f"{expt_id} {experiment_type}", procnumbers))
-            locals()[f"expt_{expt_id}"] = expts[f"expt_{expt_id}"]
+#             expts[f"expt_{expt_id}"] = (gdi.ChoiceItem(f"{expt_id} {experiment_type}", procnumbers))
+#             locals()[f"expt_{expt_id}"] = expts[f"expt_{expt_id}"]
 
-        simulated_annealing = gdi.BoolItem("Optimize Correlations", default=True)
-        ml_consent = gdi.BoolItem("Permit Data to be saved to build Database", default=False)
+#         simulated_annealing = gdi.BoolItem("Optimize Correlations", default=True)
+#         ml_consent = gdi.BoolItem("Permit Data to be saved to build Database", default=False)
     
-    return Processing
+#     return Processing
 
 def create_processing_dialog(experiments_with_peaks: Dict[str, List], converter):
     """
@@ -117,9 +117,9 @@ def create_processing_dialog(experiments_with_peaks: Dict[str, List], converter)
             _experiment_choices[f"expt_{expt_id}"] = (gdi.ChoiceItem(f"{expt_id} {experiment_type}", procnumbers))
             locals()[f"expt_{expt_id}"] = _experiment_choices[f"expt_{expt_id}"]
 
-        simulated_annealing = gdi.BoolItem("Use simulated annealing", 
+        simulated_annealing = gdi.BoolItem("Optimize Correlations", 
                                            default=True,
-                                           help="Enable simulated annealing of COSY and HMBC for structure optimization")
+                                           help="Enable simulated annealing of COSY and HMBC correlations for structure optimization")
         ml_consent = gdi.BoolItem("Permit Data to be saved to build Database", 
                                   default=False,
                                   help="Allow your data to contribute to improving NMR prediction models")
@@ -393,7 +393,7 @@ def submit_to_server(json_data: Dict) -> bool:
     """
     
     # Create progress dialog
-    progress = QProgressDialog("Submitting data to simpleNMR server...", "Cancel", 0, 0)
+    progress = QProgressDialog("Submitting data to simpleNMR server...", "Cancel", 0, 400)
     progress.setWindowModality(Qt.WindowModal)
     progress.setMinimumDuration(0)
     progress.setCancelButton(None)  # Remove cancel button since we can't easily cancel the request
@@ -443,7 +443,7 @@ def submit_to_server(json_data: Dict) -> bool:
                 print(f"Analysis complete! Results saved to '{fn_path}'")
 
                 # Open in browser
-                webbrowser.open(f'file://{fn_path}')
+                webbrowser.open(f'file://{fn_path}' )
 
                 result['success'] = True
             else:
@@ -472,9 +472,10 @@ def submit_to_server(json_data: Dict) -> bool:
         QApplication.processEvents()
         thread.join(0.1)  # Check every 100ms
         
-        # Update progress dialog text periodically to show it's still working
-        if progress.value() % 10 == 0:  # Every ~1 second
-            progress.setLabelText("Submitting data to simpleNMR server...")
+        # # Update progress dialog text periodically to show it's still working
+        # if progress.value() % 10 == 0:  # Every ~1 second
+        #     progress.setLabelText("Submitting data to simpleNMR server...")
+        progress.setValue((progress.value() + 1))
     
     progress.close()
     
