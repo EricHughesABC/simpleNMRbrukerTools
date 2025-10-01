@@ -73,7 +73,13 @@ After successful configuration, you should see:
 ![simpleNMR installed in Topspin](simpleNMRbrukerTools/docs/images/simpleNMRinstalledFlowbar.png "simpleNMR installed in Topspin")
 
 
+## Example Data Set
 
+In the top level directory of the repository there is a peak-picked dataset that can be used to test the simpleNMR installation
+
+`BrukerSimpleNMR_ExampleData.zip`
+
+Unzip the file and open one of the datasets in the directory into Topspin before clicking on the simpleNMR menu.
 
 
 ## Troubleshooting
@@ -98,6 +104,7 @@ This project falls under the MIT license.
 ## Contributing
 
 If you are interested in helping please get in touch. Fork the project and submit an update. If you have comments or suggestions get in touch via email simpleNMR@gmail.com
+
 
 
 
