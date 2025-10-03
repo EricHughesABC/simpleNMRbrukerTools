@@ -13,7 +13,7 @@ Dependencies:
 Usage:
     python main_gui.py
 """
-import os
+# import os
 import sys
 import json
 import uuid
@@ -21,7 +21,8 @@ import uuid
 import requests
 import webbrowser
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+# from typing import Dict, List, Optional, Any
+from typing import Dict, List
 import threading
 from qtpy.QtWidgets import QProgressDialog, QApplication, QMessageBox
 from qtpy.QtCore import Qt
@@ -33,14 +34,14 @@ import simpleNMRbrukerTools
 print(simpleNMRbrukerTools.__version__)
 
 # Import submodules
-from simpleNMRbrukerTools import core
-from simpleNMRbrukerTools import gui
-from simpleNMRbrukerTools import parsers
-from simpleNMRbrukerTools import utils
+# from simpleNMRbrukerTools import core
+# from simpleNMRbrukerTools import gui
+# from simpleNMRbrukerTools import parsers
+# from simpleNMRbrukerTools import utils
 
 from simpleNMRbrukerTools.core.json_converter import BrukerToJSONConverter
-from simpleNMRbrukerTools.core.data_reader import BrukerDataDirectory  
-from simpleNMRbrukerTools.config import EXPERIMENT_CONFIGS
+# from simpleNMRbrukerTools.core.data_reader import BrukerDataDirectory  
+# from simpleNMRbrukerTools.config import EXPERIMENT_CONFIGS
 
 # GUIDATA imports
 try:
@@ -57,7 +58,8 @@ except ImportError:
 
 if GUIDATA_AVAILABLE:
     # import local guidataWarningDialogs
-    from simpleNMRbrukerTools.gui.guidataWarningDialogs import WarningDialog, myGUIDATAwarn
+    # from simpleNMRbrukerTools.gui.guidataWarningDialogs import WarningDialog, myGUIDATAwarn
+    from simpleNMRbrukerTools.gui.guidataWarningDialogs import  myGUIDATAwarn
 
 class BrukerFolderDialog(DataSet):
     """Dialog for selecting Bruker experiment folder."""
@@ -281,82 +283,6 @@ def process_user_selections(dialog_instance, experiments_with_peaks: Dict, conve
     
     return user_selections
 
-
-def submit_to_server(json_data: Dict) -> bool:
-    """
-    Submit the JSON data to the processing server.
-    
-    Args:
-        json_data: The converted JSON data
-        
-    Returns:
-        True if successful, False otherwise
-    """
-    try:
-        print("Submitting data to simpleNMR server...")
-        
-        response = requests.post(
-            'https://test-simplenmr.pythonanywhere.com/simpleMNOVA',
-            headers={'Content-Type': 'application/json'},
-            json=json_data,
-            timeout=100
-        )
-        
-        print(f"Server response: {response.status_code}")
-        
-        if response.status_code == 200:
-
-            # replace dummy_title in response.txt with working_filename from json_data
-            workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
-            print(f"Working filename: {workingFilename}")
-            response_text = response.text
-            print(f"Response text length: {type(response_text)}")
-            response_text = response_text.replace("dummy_title", workingFilename)
-            print("subtituted for dummy_title")
-            # Save response to file
-            fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
-
-
-            fn_path = Path(fn_str, "html")
-
-            print(f"Working directory: {fn_path}, Exists = {fn_path.exists()}")
-
-
-            if not fn_path.exists():
-                fn_path.mkdir(parents=True, exist_ok=True)
-
-            # add filename to path
-            fn_path = Path(fn_path, workingFilename + ".html")
-
-            print(f"Saving results to: {fn_path}")
-            with open(fn_path, 'w', encoding='utf-8') as f:
-                f.write(response_text)
-
-            print(f"Analysis complete! Results saved to '{fn_path}'")
-
-            # Open in browser
-            webbrowser.open(f'file://{fn_path}')
-
-            return True
-        else:
-            print(f"Server error: {response.status_code} - {response.text}")
-            return False
-            
-    except requests.RequestException as e:
-        print(f"Network error: {e}")
-        return False
-    except Exception as e:
-        print(f"Error submitting to simpleNMR server: {e}")
-        return False
-
-# import threading
-# import webbrowser
-# from pathlib import Path
-# from typing import Dict
-# import requests
-# from qtpy.QtWidgets import QProgressDialog, QApplication, QMessageBox
-# from qtpy.QtCore import Qt
-
 def submit_to_server(json_data: Dict) -> bool:
     """
     Submit the JSON data to the processing server with progress dialog.
@@ -394,17 +320,12 @@ def submit_to_server(json_data: Dict) -> bool:
             if response.status_code == 200:
                 # replace dummy_title in response.txt with working_filename from json_data
                 workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
-                print(f"Working filename: {workingFilename}")
                 response_text = response.text
-                print(f"Response text length: {type(response_text)}")
                 response_text = response_text.replace("dummy_title", workingFilename)
-                print("subtituted for dummy_title")
                 
                 # Save response to file
                 fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
                 fn_path = Path(fn_str, "html")
-
-                print(f"Working directory: {fn_path}, Exists = {fn_path.exists()}")
 
                 if not fn_path.exists():
                     fn_path.mkdir(parents=True, exist_ok=True)
@@ -412,7 +333,6 @@ def submit_to_server(json_data: Dict) -> bool:
                 # add filename to path
                 fn_path = Path(fn_path, workingFilename + ".html")
 
-                print(f"Saving results to: {fn_path}")
                 with open(fn_path, 'w', encoding='utf-8') as f:
                     f.write(response_text)
 
@@ -449,8 +369,6 @@ def submit_to_server(json_data: Dict) -> bool:
         thread.join(0.1)  # Check every 100ms
         
         # # Update progress dialog text periodically to show it's still working
-        # if progress.value() % 10 == 0:  # Every ~1 second
-        #     progress.setLabelText("Submitting data to simpleNMR server...")
         progress.setValue((progress.value() + 1))
     
     progress.close()
@@ -503,8 +421,6 @@ def hsqc_present(user_selections):
 # Initialize QApplication for GUIDATA
 _app = guidata.qapplication()
 
-
-
 def main():
 
     top = Topspin()
@@ -517,14 +433,9 @@ def main():
         print("Please load a data set that you are working on into Topspin")
     else:
         brukerRootFolder = get_bruker_root_folder_from_identifier(cdataset.getIdentifier())
-        bruker_expt_folder = get_bruker_root_folder_from_identifier(cdataset.getIdentifier())
+        # bruker_expt_folder = get_bruker_root_folder_from_identifier(cdataset.getIdentifier())
 
     print(brukerRootFolder)
-
-    """Main function with GUI interface."""
-    print("=" * 60)
-    print("Bruker NMR Data Converter - GUI Version")
-    print("=" * 60)
     
     # Check user registration
     if not check_user_registration():
@@ -533,7 +444,6 @@ def main():
         input("Press Enter to exit...")
         myGUIDATAwarn("Unable to verify registration. Please check your internet connection or contact support.")
         return
-
     
     print("\n Registration verified. Starting application...")
     
@@ -664,21 +574,22 @@ def main():
         myGUIDATAwarn(f"Warning: Could not save JSON file: {e}")
         return
     
+    # check if the molfile string is greater than 0:  ie a valid molfile was found in the topspin dataset
+    print("Checking for valid molfile in JSON data...")
+    print("json_data keys:", json_data.keys())
+    if  "molfile" not in json_data :
+        print("Warning: No valid molfile found.")
+        myGUIDATAwarn("Warning: No valid molfile found.")
+        return
+
     # Step 8: Submit to server for analysis
     print("\n7. Submitting to simpleNMR Server...")
     if submit_to_server(json_data):
         print("Analysis complete! Check the opened browser window for results.")
     else:
-        print("Server submission failed, but JSON file was saved locally.")
-        print(f"   You can manually submit the file: {output_filename}")
-        myGUIDATAwarn("Server submission failed, but JSON file was saved locally.\nYou can manually submit the file.")
+        myGUIDATAwarn("Server submission failed")
         return
     
-    # success = submit_to_server(your_json_data)
-    # if success:
-    #     print("Submission completed successfully")
-    # else:
-    #     print("Submission failed")
 
     print("\n" + "=" * 60)
     print("Processing Complete!")
@@ -698,5 +609,4 @@ if __name__ == "__main__":
         myGUIDATAwarn(f"Unexpected error: \n {e}")
         import traceback
         traceback.print_exc()
-        input("\nPress Enter to exit...")
 
