@@ -33,11 +33,10 @@ from bruker.data.nmr import *
 import simpleNMRbrukerTools
 print(simpleNMRbrukerTools.__version__)
 
-# Import submodules
-# from simpleNMRbrukerTools import core
-# from simpleNMRbrukerTools import gui
-# from simpleNMRbrukerTools import parsers
-# from simpleNMRbrukerTools import utils
+SERVERADDRESSLOCAL = "http://localhost:5000/"
+SERVERADDRESSPYTHONANYWHERE = "https://test-simplenmr.pythonanywhere.com/"
+
+SERVERADDRESS = SERVERADDRESSPYTHONANYWHERE
 
 from simpleNMRbrukerTools.core.json_converter import BrukerToJSONConverter
 # from simpleNMRbrukerTools.core.data_reader import BrukerDataDirectory  
@@ -120,7 +119,8 @@ def check_user_registration() -> bool:
         
         # Prepare request
         json_obj = {"hostname": mac_based_id}
-        entry_point = "https://test-simplenmr.pythonanywhere.com/check_machine_learning"
+        # entry_point = "https://test-simplenmr.pythonanywhere.com/check_machine_learning"
+        entry_point = SERVERADDRESS + "check_machine_learning"
         
         print("Checking user registration...")
         
@@ -309,7 +309,7 @@ def submit_to_server(json_data: Dict) -> bool:
             print("Submitting data to simpleNMR server...")
             
             response = requests.post(
-                'https://test-simplenmr.pythonanywhere.com/simpleMNOVA',
+                SERVERADDRESS + 'simpleMNOVA',
                 headers={'Content-Type': 'application/json'},
                 json=json_data,
                 timeout=100
