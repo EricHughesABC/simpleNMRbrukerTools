@@ -7,8 +7,12 @@ A set of Python tools to use simpleNMR under Bruker NMR TopSpin (>= 4.5.0).
 Before installing simpleNMRbrukerTools, ensure you have:
 
 - **Python 3** installed for TopSpin 4.5.0
-- **Bruker-TopSpin Python libraries* installed (follow the Bruker Python 3 API inJupyter notebook PDF)
+- **Bruker-TopSpin Python libraries* installed (follow the Bruker Python 3 API in Jupyter notebook PDF)
 - Access to the Bruker/TopSpin Python3 environment
+  - open a terminal
+  - activate the Bruker python environment
+  - ```source Bruker_Python_Directory\bin\activate```
+  - use this terminal environment to install the simpleNMRbrukerTools
 
 
 ## Installation
@@ -104,6 +108,7 @@ This project falls under the MIT license.
 ## Contributing
 
 If you are interested in helping please get in touch. Fork the project and submit an update. If you have comments or suggestions get in touch via email simpleNMR@gmail.com
+
 
 
 
