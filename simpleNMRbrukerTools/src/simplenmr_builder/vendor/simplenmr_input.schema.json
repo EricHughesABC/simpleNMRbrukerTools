@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/EricHughesABC/simpleNMRtools/schemas/simplenmr_input.schema.json",
+  "title": "simpleNMR /simpleMNOVA input JSON contract",
+  "description": "Structural definition of the JSON file submitted by MNova, Bruker, and JEOL/JASON client converters to simpleNMRtools' /simpleMNOVA endpoint. Generated from simpleNMR_field_manifest.yaml — every constraint here traces back to a confirmed finding in that manifest, not assumption. Fields the manifest marked 'required: unknown' are deliberately left OPTIONAL in this schema rather than omitted or required, per an explicit decision to tighten only as each is confirmed. This schema validates STRUCTURE and TYPE only; the one hard cross-field business rule (HSQC must actually be present and not SKIP'd) cannot be expressed in JSON Schema alone and is checked separately by validate_simplenmr_json.py.",
+
+  "type": "object",
+
+  "$defs": {
+    "envelope_singleton_scalar": {
+      "type": "object",
+      "description": "category: singleton_scalar — parsed server-side via DataFrame(data, index=[0]).",
+      "properties": {
+        "datatype": { "type": "string" },
+        "count": { "type": "integer" },
+        "data": {
+          "type": "object",
+          "description": "Single-value payload keyed by the string '0'.",
+          "properties": {
+            "0": {}
+          },
+          "required": ["0"]
+        }
+      },
+      "required": ["data"]
+    },
+
+    "envelope_indexed_dict": {
+      "type": "object",
+      "description": "category: indexed_dict — parsed server-side via DataFrame.from_dict(data, orient='index'). Each record in 'data' is validated against atomInfoRecord for the fields that apply (atom_idx, atomNumber, numProtons) — extra source-specific columns per record are permitted, since allAtomsInfo/carbonAtomsInfo/nmrAssignments/c13predictions each carry a different real column set per the manifest.",
+      "properties": {
+        "datatype": { "type": "string" },
+        "count": { "type": "integer" },
+        "data": {
+          "type": "object",
+          "description": "Dict of records, keyed by string row index.",
+          "additionalProperties": { "$ref": "#/$defs/atomInfoRecord" }
+        }
+      },
+      "required": ["data"]
+    },
+
+    "envelope_special_string_list": {
+      "type": "object",
+      "description": "category: special — chosenSpectra / exptIdentifiers / spectraWithPeaks shape: dict of string-indexed values.",
+      "properties": {
+        "datatype": { "type": "string" },
+        "count": { "type": "integer" },
+        "data": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["data"]
+    },
+
+    "atomInfoRecord": {
+      "type": "object",
+      "description": "One record inside allAtomsInfo / carbonAtomsInfo / nmrAssignments / c13predictions. atomNumber is a free-form user-facing DISPLAY LABEL (supports primed forms like \"4'\", \"6''\") and is NOT the same as atom_idx, which is the true molfile/RDKit structural index — confirmed real example: atomNumber \"6'\" alongside a purely numeric atom_idx on the same record.",
+      "properties": {
+        "atom_idx": { "type": "integer" },
+        "atomNumber": {
+          "description": "Free-form display label. May be numeric-looking (server coerces numeric strings to int for display) or an arbitrary string such as a primed label. Typed as a string here since that is its true semantic type; numeric JSON values are also accepted since some sources (e.g. JEOL/JASON) submit it as int.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "integer" }
+          ]
+        },
+        "numProtons": { "type": "integer" }
+      }
+    }
+  },
+
+  "properties": {
+    "smiles": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: everywhere. No graceful server-side fallback if absent — NMRProblem.add_missing_spectra does not cover this key, and nmrsolution.py accesses it via unguarded dict indexing. Validate presence carefully at the interface layer."
+    },
+    "molfile": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: everywhere. Same no-graceful-fallback caveat as smiles."
+    },
+    "hostname": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: everywhere — confirmed for all three sources (Bruker, JEOL by code reading; MNova by direct confirmation and a real submitted file). Mac-based device id, used server-side for device registration/licensing gating. Degrades gracefully if missing (extract_hostname() returns \"\" on KeyError), unlike smiles/molfile/carbonAtomsInfo."
+    },
+
+    "allAtomsInfo": {
+      "$ref": "#/$defs/envelope_indexed_dict",
+      "description": "required: everywhere."
+    },
+    "carbonAtomsInfo": {
+      "$ref": "#/$defs/envelope_indexed_dict",
+      "description": "required: everywhere. Minimally needs atom_idx and atomNumber per record — other columns (ppm, x, y, iupacLabel, jCouplingVals/Class, H1_ppm, visible) are server-computed/overwritten, not trusted input. No graceful fallback if the key itself is missing — same caveat as smiles/molfile."
+    },
+    "nmrAssignments": {
+      "$ref": "#/$defs/envelope_indexed_dict",
+      "description": "required: [mnova, bruker], missing_from: [jason] — left optional here since not universal. Minimally needs atom_idx, atomNumber, f1_ppm, f2_ppm1, f2_ppm2 per record (f2_ppm3 present in real files but confirmed unused server-side)."
+    },
+    "c13predictions": {
+      "$ref": "#/$defs/envelope_indexed_dict",
+      "description": "required: conditional — legitimately empty/absent when no carbon-shift predictor is available for that source. Only trusted server-side when MNOVAcalcMethod is 'JEOL Predict' or 'MNOVA Predict' (JEOL_prediction_used() gate) — for 'NMRSHIFTDB2 Predict' or any other value the server recomputes its own shifts and ignores this field even if present."
+    },
+
+    "MNOVAcalcMethod": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: everywhere. Observed values: 'MNOVA Predict', 'NMRSHIFTDB2 Predict', 'JEOL Predict', or other/empty. Gates three server-side methods (is_prediction, prediction_from_nmrshiftdb2, JEOL_prediction_used) with confirmed non-obvious behavior — see manifest for the c13predictions trust-logic correction."
+    },
+    "carbonCalcPositionsMethod": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: [jason, bruker], missing_from: [mnova] — left optional here."
+    },
+    "workingDirectory": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: unknown — left optional pending confirmation. Confirmed server_consumed: false (passthrough) in core, but used by Bruker's own client for saving the HTML response locally."
+    },
+    "workingFilename": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: unknown — left optional pending confirmation. Same passthrough/client-local-use pattern as workingDirectory."
+    },
+
+    "simulatedAnnealing": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: everywhere (corrected from an earlier bruker-only read — confirmed present in MNova's real payload too). Boolean on/off flag; the ONLY simulated-annealing field that should be part of the contract going forward. Real solve additionally requires simAnneal.predicted_weight > 0 server-side, invisible from the input JSON."
+    },
+    "ml_consent": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "required: everywhere. Boolean. Falls back to False on KeyError server-side, so effectively optional in practice despite being read unconditionally — included as required here since it is always actually submitted in real files from all three sources."
+    },
+
+    "randomizeStart": {
+      "$ref": "#/$defs/envelope_singleton_scalar",
+      "description": "DEPRECATED FROM CONTRACT — may still appear as passthrough (particularly MNova). Not required; presence, absence, or cross-source inconsistency should not be flagged as an error by any diff/golden-file tooling built on this schema."
+    },
+    "startingTemperature": { "$ref": "#/$defs/envelope_singleton_scalar", "description": "DEPRECATED FROM CONTRACT — see randomizeStart." },
+    "endingTemperature": { "$ref": "#/$defs/envelope_singleton_scalar", "description": "DEPRECATED FROM CONTRACT — see randomizeStart." },
+    "coolingRate": { "$ref": "#/$defs/envelope_singleton_scalar", "description": "DEPRECATED FROM CONTRACT — see randomizeStart. Also independently confirmed unused server-side (a hardcoded constant is used instead)." },
+    "numberOfSteps": { "$ref": "#/$defs/envelope_singleton_scalar", "description": "DEPRECATED FROM CONTRACT — see randomizeStart." },
+    "ppmGroupSeparation": { "$ref": "#/$defs/envelope_singleton_scalar", "description": "DEPRECATED FROM CONTRACT — see randomizeStart." },
+
+    "chosenSpectra": {
+      "$ref": "#/$defs/envelope_special_string_list",
+      "description": "required: everywhere — confirmed for all three sources. Each string value ends in the chosen experiment type as its final whitespace-delimited token (server parses via s.split()[-1]); the literal token 'SKIP' as that final token is valid and expected to be stripped server-side. MNova submits SKIP'd spectra with the literal token present; Bruker and JEOL both intend to filter SKIP'd spectra out before submission entirely (JEOL's filtering has a confirmed bug that can let some through — see manifest). Either pattern is accepted by the server; a schema/converter should not assume only one is correct."
+    },
+    "exptIdentifiers": {
+      "$ref": "#/$defs/envelope_special_string_list",
+      "description": "required: [mnova, bruker], missing_from: [jason] confirmed by direct code reading — left optional here. Distinct SKIP semantics from chosenSpectra depending on source: for MNova it mirrors the user's full per-spectrum dropdown assignment (including SKIP as an explicit choice); for Bruker it is built from ALL raw detected experiments (not just user-selected ones) with 'SKIP' as a fallback meaning 'auto-classifier could not identify this experiment type' — a different meaning from the same string elsewhere."
+    },
+    "spectraWithPeaks": {
+      "$ref": "#/$defs/envelope_special_string_list",
+      "description": "required: unknown — left optional pending confirmation."
+    },
+
+    "subtype": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "pulsesequence": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "intrument": { "description": "required: unknown, server_consumed: false (passthrough; sic, typo preserved from the source field name)." },
+    "probe": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "class": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "origin": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "spectype": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "experiment": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "filename": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "datafilename": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." },
+    "expt_fn": { "description": "required: unknown, server_consumed: false (passthrough, per-spectrum-block metadata)." }
+  },
+
+  "required": [
+    "smiles",
+    "molfile",
+    "hostname",
+    "allAtomsInfo",
+    "carbonAtomsInfo",
+    "MNOVAcalcMethod",
+    "simulatedAnnealing",
+    "ml_consent",
+    "chosenSpectra"
+  ],
+
+  "patternProperties": {
+    "^(H1_1D|C13_1D|DEPT135|HSQC|HMBC|COSY|NOESY|H1_pureshift|HSQC_CLIPCOSY|DDEPTCH3ONLY|SKIP)(_[0-9]+)?$": {
+      "type": "object",
+      "description": "Spectrum-block field (category: spectrum_block). Multiple blocks of the SAME experiment type (e.g. HSQC_0 + HSQC_1) are an intentional, supported workflow for ANY of the 10 NMREXPERIMENTS types, confirmed by Eric — e.g. two acquisitions of the same experiment collected under different regimes for improved resolution. The server combines same-type blocks into one dataframe via exact-value ppm de-duplication (no tolerance window — see manifest's caution_exact_match_dedup for a flagged-but-unconfirmed concern about whether this achieves true reconciliation across different-resolution acquisitions). A key literally prefixed 'SKIP' (e.g. 'SKIP_0') is valid and expected: MNova tags a user-skipped spectrum's own block with the dropdown value as its classification prefix, which independently guarantees it can never classify into a real experiment type regardless of chosenSpectra string parsing. NOESY classifies and parses like any other type but is confirmed never read by any server-side solving logic — a legitimate but functionally inert passthrough.",
+      "properties": {
+        "datatype": { "type": "string" },
+        "type": {
+          "type": "string",
+          "description": "'1D' or '2D' — this, not the key name, is what the server actually uses to decide 1D vs 2D parsing.",
+          "enum": ["1D", "2D", "1d", "2d"]
+        },
+        "nucleus": { "description": "server_consumed: false (passthrough). Type varies by source in real files — harmless since unconsumed." },
+        "specfrequency": { "description": "server_consumed: false (passthrough)." },
+        "temperature": { "description": "server_consumed: false (passthrough)." },
+        "solvent": { "type": "string", "description": "server_consumed: false (passthrough)." },
+        "experimenttype": { "type": "string", "description": "server_consumed: false (passthrough) — vocabulary differs across sources, confirmed harmless since not used for classification." }
+      },
+      "required": ["type"]
+    }
+  },
+
+  "additionalProperties": true
+}

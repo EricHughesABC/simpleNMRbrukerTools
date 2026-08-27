@@ -34,7 +34,7 @@ import simpleNMRbrukerTools
 print(simpleNMRbrukerTools.__version__)
 
 SERVERADDRESSLOCAL = "http://localhost:5000/"
-SERVERADDRESSPYTHONANYWHERE = "https://simplenmr.pythonanywhere.com/"
+SERVERADDRESSPYTHONANYWHERE = "https://test-simplenmr.pythonanywhere.com/"
 
 SERVERADDRESS = SERVERADDRESSPYTHONANYWHERE
 
@@ -342,38 +342,10 @@ def submit_to_server(json_data: Dict) -> bool:
                 webbrowser.open(f'file://{fn_path}' )
 
                 result['success'] = True
-            elif response.status_code == 400:
-                # display error mesage in html page
-
-                workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
-                response_text = response.text
-                
-                # Save response to file
-                fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
-                fn_path = Path(fn_str, "html")
-
-                if not fn_path.exists():
-                    fn_path.mkdir(parents=True, exist_ok=True)
-
-                # add filename to path
-                fn_path = Path(fn_path, workingFilename + ".html")
-
-                with open(fn_path, 'w', encoding='utf-8') as f:
-                    f.write(response_text)
-
-                print(f"Analysis complete! Results saved to '{fn_path}'")
-
-                # Open in browser
-                webbrowser.open(f'file://{fn_path}' )
-
-                error_msg = f"Server error: {response.status_code}"
-                result['error'] = error_msg
-                result['success'] = False
             else:
                 error_msg = f"Server error: {response.status_code} - {response.text}"
                 print(error_msg)
                 result['error'] = error_msg
-                result['success'] = False
                 
         except requests.RequestException as e:
             error_msg = f"Network error: {e}"
@@ -579,11 +551,40 @@ def main():
     # Step 6: Convert to JSON
     print("\n6. Converting to JSON...")
     try:
-        json_data = converter.convert_to_json(
-            user_expt_selections=user_selections,
-            ml_consent=ml_consent,
-            simulated_annealing=simulated_annealing
-        )
+        if getattr(converter, "convert_to_json_via_builder", None) is not None:
+            try:
+                json_data = converter.convert_to_json_via_builder(
+                    user_expt_selections=user_selections,
+                    ml_consent=ml_consent,
+                    simulated_annealing=simulated_annealing,
+                )
+            except Exception as builder_exc:
+                # Only ContractError-family exceptions represent a real,
+                # specific reason the submission itself is invalid (missing
+                # required field, no HSQC, unrecognized experiment-type
+                # token). Anything else (e.g. simplenmr_builder not
+                # actually importable despite the attribute existing) falls
+                # back to the original hand-rolled path below rather than
+                # aborting the whole run.
+                from simplenmr_builder import ContractError
+
+                if isinstance(builder_exc, ContractError):
+                    print(f"Error during JSON conversion: {builder_exc}")
+                    myGUIDATAwarn(
+                        f"The data could not be validated for submission:\n\n{builder_exc}"
+                    )
+                    return
+                raise
+        else:
+            print(
+                "WARNING: simplenmr_builder is not available - falling back to the "
+                "original JSON construction with no pre-submission validation."
+            )
+            json_data = converter.convert_to_json(
+                user_expt_selections=user_selections,
+                ml_consent=ml_consent,
+                simulated_annealing=simulated_annealing
+            )
         print("JSON conversion complete")
     except Exception as e:
         print(f"Error during JSON conversion: {e}")
