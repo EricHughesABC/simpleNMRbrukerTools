@@ -214,6 +214,9 @@ class BrukerToJSONConverter:
         Returns:
             Complete JSON data structure
         """
+
+
+
         # Clear any existing data
         self.json_data = {}
         

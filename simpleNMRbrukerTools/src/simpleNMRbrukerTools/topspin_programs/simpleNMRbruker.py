@@ -34,7 +34,7 @@ import simpleNMRbrukerTools
 print(simpleNMRbrukerTools.__version__)
 
 SERVERADDRESSLOCAL = "http://localhost:5000/"
-SERVERADDRESSPYTHONANYWHERE = "https://test-simplenmr.pythonanywhere.com/"
+SERVERADDRESSPYTHONANYWHERE = "https://simplenmr.pythonanywhere.com/"
 
 SERVERADDRESS = SERVERADDRESSPYTHONANYWHERE
 
@@ -342,10 +342,38 @@ def submit_to_server(json_data: Dict) -> bool:
                 webbrowser.open(f'file://{fn_path}' )
 
                 result['success'] = True
+            elif response.status_code == 400:
+                # display error mesage in html page
+
+                workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
+                response_text = response.text
+                
+                # Save response to file
+                fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
+                fn_path = Path(fn_str, "html")
+
+                if not fn_path.exists():
+                    fn_path.mkdir(parents=True, exist_ok=True)
+
+                # add filename to path
+                fn_path = Path(fn_path, workingFilename + ".html")
+
+                with open(fn_path, 'w', encoding='utf-8') as f:
+                    f.write(response_text)
+
+                print(f"Analysis complete! Results saved to '{fn_path}'")
+
+                # Open in browser
+                webbrowser.open(f'file://{fn_path}' )
+
+                error_msg = f"Server error: {response.status_code}"
+                result['error'] = error_msg
+                result['success'] = False
             else:
                 error_msg = f"Server error: {response.status_code} - {response.text}"
                 print(error_msg)
                 result['error'] = error_msg
+                result['success'] = False
                 
         except requests.RequestException as e:
             error_msg = f"Network error: {e}"
