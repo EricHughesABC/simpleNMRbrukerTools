@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-main_gui.py - Main program with GUIDATA interface for Bruker NMR data conversion
+main_gui.py - Main program with PyQt/qtpy interface for Bruker NMR data conversion
 
 This program provides a GUI interface for selecting Bruker data directories,
 choosing experiments to process, and converting them to JSON format.
 
 Dependencies:
-- guidata
-- PyQt5 (or PySide2)
+- qtpy + a Qt binding (PySide6) — guidata removed 2026-08-27, see
+  simplenmr_builder.gui.procno_selection_dialog for the replacement
+- simpleNMRbuilder[gui,viewer] — hard dependency, see below (2026-08-28)
 - All the refactored bruker_nmr modules
 
 Usage:
@@ -18,13 +19,10 @@ import sys
 import json
 import uuid
 # import socket
-import requests
-import webbrowser
 from pathlib import Path
 # from typing import Dict, List, Optional, Any
 from typing import Dict, List
-import threading
-from qtpy.QtWidgets import QProgressDialog, QApplication, QMessageBox
+from qtpy.QtWidgets import QProgressDialog, QApplication, QMessageBox, QFileDialog
 from qtpy.QtCore import Qt
 
 from bruker.api.topspin import Topspin
@@ -34,149 +32,50 @@ import simpleNMRbrukerTools
 print(simpleNMRbrukerTools.__version__)
 
 SERVERADDRESSLOCAL = "http://localhost:5000/"
-SERVERADDRESSPYTHONANYWHERE = "https://simplenmr.pythonanywhere.com/"
+SERVERADDRESSPYTHONANYWHERE = "https://test-simplenmr.pythonanywhere.com/"
 
 SERVERADDRESS = SERVERADDRESSPYTHONANYWHERE
+
+# ── simplenmr_builder — hard dependency, 2026-08-28 ──────────────────────
+# Previously imported defensively with local fallbacks: ~230 lines of
+# duplicated submission/registration code (_local_check_user_registration,
+# _local_submit_to_server), kept alive purely to cover "the shared
+# library isn't installed." That's exactly the failure mode this project
+# has been fixing all along — the original JEOL SKIP-removal bug
+# survived unfixed in 7 separate copies of that file for the same
+# reason, and a stale local submission.py already caused one real silent
+# regression on this project. Fallbacks that exist purely for a missing
+# dependency don't get bugfixes and don't get noticed when they drift.
+# simplenmr_builder is now a hard dependency here: if it's missing, fail
+# loudly and immediately at import time with a clear fix.
+try:
+    from simplenmr_builder.gui.submission import (
+        SubmissionOutcome,
+        check_user_registration as _shared_check_user_registration,
+        open_result_viewer_subprocess,
+        submit_to_server as _shared_submit_to_server,
+    )
+    from simplenmr_builder.gui.procno_selection_dialog import ProcnoSelectionDialog
+except ImportError as e:
+    print(
+        "ERROR: simplenmr_builder[gui,viewer] is not installed in this "
+        "environment. Install it with:\n"
+        '    pip install -e "<path-to-simpleNMRbuilder>[gui,viewer]"\n'
+        f"\nUnderlying import error: {e}"
+    )
+    sys.exit(1)
 
 from simpleNMRbrukerTools.core.json_converter import BrukerToJSONConverter
 # from simpleNMRbrukerTools.core.data_reader import BrukerDataDirectory  
 # from simpleNMRbrukerTools.config import EXPERIMENT_CONFIGS
 
-# GUIDATA imports
-try:
-    import guidata
-    import guidata.dataset as gds
-    import guidata.dataset.dataitems as gdi
-    from guidata.dataset.datatypes import DataSet
-    from guidata.dataset.dataitems import DirectoryItem
-    GUIDATA_AVAILABLE = True
-except ImportError:
-    print("Error: GUIDATA not available. Please install guidata:")
-    print("pip install guidata")
-    sys.exit(1)
 
-if GUIDATA_AVAILABLE:
-    # import local guidataWarningDialogs
-    # from simpleNMRbrukerTools.gui.guidataWarningDialogs import WarningDialog, myGUIDATAwarn
-    from simpleNMRbrukerTools.gui.guidataWarningDialogs import  myGUIDATAwarn
-
-class BrukerFolderDialog(DataSet):
-    """Dialog for selecting Bruker experiment folder."""
-    bruker_folder = DirectoryItem("Bruker Data Folder", default=".")
-
-
-def create_processing_dialog(experiments_with_peaks: Dict[str, List], converter):
-    """
-    Dynamically create a processing dialog based on available experiments.
-    
-    Args:
-        experiments_with_peaks: Dictionary mapping experiment IDs to available processing folders
-        converter: BrukerToJSONConverter instance
-        
-    Returns:
-        DataSet class for the processing dialog
-    """
-    class Processing(gds.DataSet):
-        """Choose Spectra"""
-        
-        _experiment_choices = {}
-        
-        for expt_id, proc_files in experiments_with_peaks.items():
-            expt_data = converter.bruker_data[expt_id]
-            experiment_type = expt_data.get('experimentType', 'Unknown')
-            if experiment_type == "Unknown":
-                continue
-            
-            procnumbers = [proc_file.name for proc_file in proc_files]
-            procnumbers.append("SKIP")
-            print(expt_id, procnumbers)
-
-            _experiment_choices[f"expt_{expt_id}"] = (gdi.ChoiceItem(f"{expt_id} {experiment_type}", procnumbers))
-            locals()[f"expt_{expt_id}"] = _experiment_choices[f"expt_{expt_id}"]
-
-        simulated_annealing = gdi.BoolItem("Optimize Correlations", 
-                                           default=True,
-                                           help="Enable simulated annealing of COSY and HMBC correlations for structure optimization")
-        ml_consent = gdi.BoolItem("Permit Data to be saved to build Database", 
-                                  default=False,
-                                  help="Allow your data to contribute to improving NMR prediction models")
-    
-    return Processing
+def myGUIDATAwarn(message: str, title: str = "Warning") -> None:
+    """Plain QMessageBox warning dialog — no guidata dependency. Kept
+    under its original name since it's called from many places in this
+    file; only the implementation changed."""
+    QMessageBox.warning(None, title, message)
  
-
-
-def check_user_registration() -> bool:
-    """
-    Check if the user's machine is registered for the service.
-    
-    Returns:
-        True if user can proceed, False otherwise
-    """
-    try:
-        # Generate machine ID (MAC address based)
-        mac_based_id = hex(uuid.getnode())
-        print(f"Machine ID: {mac_based_id}")
-        
-        # Prepare request
-        json_obj = {"hostname": mac_based_id}
-        # entry_point = "https://test-simplenmr.pythonanywhere.com/check_machine_learning"
-        entry_point = SERVERADDRESS + "check_machine_learning"
-        
-        print("Checking user registration...")
-        
-        # Make the POST request
-        response = requests.post(
-            entry_point,
-            headers={'Content-Type': 'application/json'},
-            json=json_obj,
-            timeout=100
-        )
-        
-        print(f"Registration check response: {response.status_code}")
-        
-        if response.status_code == 200:
-            try:
-                response_data = response.json()
-            except json.JSONDecodeError:
-                print("Invalid JSON response from server.")
-                myGUIDATAwarn("Invalid JSON response from server.")
-                return False
-            
-            status = response_data.get("status", False)
-            
-            if isinstance(status, str) and status.strip().lower() == "unregistered":
-                print("Machine is unregistered. Opening registration page...")
-                registration_url = response_data.get("registration_url", "")
-                if registration_url:
-                    webbrowser.open(registration_url)
-                else:
-                    print("No registration URL provided.")
-                myGUIDATAwarn("No registration URL provided.")
-                return False
-            
-            elif isinstance(status, str) and status.strip().lower() == "registered":
-                print("Machine is registered. Proceeding...")
-                return True
-            
-            elif isinstance(status, bool) and not status:
-                print("Registration status unclear.")
-                myGUIDATAwarn("Registration status unclear.")
-                return False
-            
-        else:
-            print(f"Registration check failed: {response.status_code} - {response.text}")
-            myGUIDATAwarn(f"Registration check failed: {response.status_code} - {response.text}")
-            
-    except requests.RequestException as e:
-        print(f"Network error during registration check: {e}")
-        print("Proceeding without registration check...")
-        myGUIDATAwarn("Network error during registration check. Proceeding without registration check.")
-        return True  # Allow offline usage
-    except Exception as e:
-        print(f"Error during registration check: {e}")
-        myGUIDATAwarn(f"Error during registration check: {e}")
-        
-    return False
 
 
 def find_experiments_with_peaks(converter) -> Dict[str, List]:
@@ -234,187 +133,42 @@ def find_experiments_with_peaks(converter) -> Dict[str, List]:
     return experiments_with_peaks
 
 
-def process_user_selections(dialog_instance, experiments_with_peaks: Dict, converter) -> Dict[str, Dict]:
+def process_user_selections(procno_selections: Dict[str, str], converter) -> Dict[str, Dict]:
     """
-    Process user selections from the dialog.
-    
-    Args:
-        dialog_instance: Instance of the ProcessingDialog
-        experiments_with_peaks: Available experiments
-        converter: BrukerToJSONConverter instance
-        
-    Returns:
-        Dictionary of user selections for conversion
+    Combine the dialog's {expt_id: procno} selections with each
+    experiment's known type into the shape convert_to_json_via_builder()
+    expects: {expt_id: {"experimentType": ..., "procno": ...}}.
+
+    Much simpler than the original: ProcnoSelectionDialog.get_selections()
+    already excludes SKIP'd rows and returns the chosen procno directly
+    (no index-into-choices-list lookup needed, unlike the old
+    guidata ChoiceItem, which stored a selected INDEX).
     """
+    data_dict = converter.bruker_data.data if hasattr(converter.bruker_data, 'data') else converter.bruker_data
+
     user_selections = {}
-    
-    # Handle both data structures
-    if hasattr(converter, 'bruker_data'):
-        data_dict = converter.bruker_data.data if hasattr(converter.bruker_data, 'data') else converter.bruker_data
-    else:
-        data_dict = converter._all_bruker_folders
-    
-    for expt_id in experiments_with_peaks.keys():
+    for expt_id, procno in procno_selections.items():
         expt_data = data_dict[expt_id]
         experiment_type = expt_data.get('experimentType', 'Unknown')
-        
-        if experiment_type == "Unknown":
-            continue
-        
-        attr_name = f"expt_{expt_id}"
-        if hasattr(dialog_instance, attr_name):
-            selected_index = getattr(dialog_instance, attr_name)
-            
-            # Get the choice item to access the options
-            choice_item = dialog_instance._experiment_choices[attr_name]
-            choices = choice_item.get_prop("data", "choices")
-            
-            # Convert index to actual choice text
-            if 0 <= selected_index < len(choices):
-                selected_choice = choices[selected_index][1]  # choices is list of (value, label) tuples
-                
-                print(f"User selected: {expt_id} ({experiment_type}) -> {selected_choice}")
-                
-                if selected_choice != "SKIP":
-                    user_selections[expt_id] = {
-                        "experimentType": experiment_type,
-                        "procno": selected_choice
-                    }
-    
+        print(f"User selected: {expt_id} ({experiment_type}) -> {procno}")
+        user_selections[expt_id] = {"experimentType": experiment_type, "procno": procno}
+
     return user_selections
 
-def submit_to_server(json_data: Dict) -> bool:
-    """
-    Submit the JSON data to the processing server with progress dialog.
-    
-    Args:
-        json_data: The converted JSON data
-        
-    Returns:
-        True if successful, False otherwise
-    """
-    
-    # Create progress dialog
-    progress = QProgressDialog("Submitting data to simpleNMR server...", "Cancel", 0, 400)
-    progress.setWindowModality(Qt.WindowModal)
-    progress.setMinimumDuration(0)
-    progress.setCancelButton(None)  # Remove cancel button since we can't easily cancel the request
-    progress.show()
-    
-    # Variables to store result
-    result = {'success': False, 'error': None, 'finished': False}
-    
-    def make_request():
-        try:
-            print("Submitting data to simpleNMR server...")
-            
-            response = requests.post(
-                SERVERADDRESS + 'simpleMNOVA',
-                headers={'Content-Type': 'application/json'},
-                json=json_data,
-                timeout=100
-            )
-            
-            print(f"Server response: {response.status_code}")
-            
-            if response.status_code == 200:
-                # replace dummy_title in response.txt with working_filename from json_data
-                workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
-                response_text = response.text
-                response_text = response_text.replace("dummy_title", workingFilename)
-                
-                # Save response to file
-                fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
-                fn_path = Path(fn_str, "html")
 
-                if not fn_path.exists():
-                    fn_path.mkdir(parents=True, exist_ok=True)
+def check_user_registration() -> bool:
+    """Wraps the shared simplenmr_builder.gui.submission.check_user_registration
+    with Bruker's server address."""
+    return _shared_check_user_registration(SERVERADDRESS + "check_machine_learning")
 
-                # add filename to path
-                fn_path = Path(fn_path, workingFilename + ".html")
 
-                with open(fn_path, 'w', encoding='utf-8') as f:
-                    f.write(response_text)
-
-                print(f"Analysis complete! Results saved to '{fn_path}'")
-
-                # Open in browser
-                webbrowser.open(f'file://{fn_path}' )
-
-                result['success'] = True
-            elif response.status_code == 400:
-                # display error mesage in html page
-
-                workingFilename = json_data["workingFilename"]["data"].get("0", "nmr_analysis_result")
-                response_text = response.text
-                
-                # Save response to file
-                fn_str = json_data["workingDirectory"]["data"].get("0", ".") 
-                fn_path = Path(fn_str, "html")
-
-                if not fn_path.exists():
-                    fn_path.mkdir(parents=True, exist_ok=True)
-
-                # add filename to path
-                fn_path = Path(fn_path, workingFilename + ".html")
-
-                with open(fn_path, 'w', encoding='utf-8') as f:
-                    f.write(response_text)
-
-                print(f"Analysis complete! Results saved to '{fn_path}'")
-
-                # Open in browser
-                webbrowser.open(f'file://{fn_path}' )
-
-                error_msg = f"Server error: {response.status_code}"
-                result['error'] = error_msg
-                result['success'] = False
-            else:
-                error_msg = f"Server error: {response.status_code} - {response.text}"
-                print(error_msg)
-                result['error'] = error_msg
-                result['success'] = False
-                
-        except requests.RequestException as e:
-            error_msg = f"Network error: {e}"
-            print(error_msg)
-            result['error'] = error_msg
-        except Exception as e:
-            error_msg = f"Error submitting to simpleNMR server: {e}"
-            print(error_msg)
-            result['error'] = error_msg
-        finally:
-            result['finished'] = True
-    
-    # Start request in background thread
-    thread = threading.Thread(target=make_request)
-    thread.daemon = True
-    thread.start()
-    
-    # Process events until request is complete
-    while not result['finished']:
-        QApplication.processEvents()
-        thread.join(0.1)  # Check every 100ms
-        
-        # # Update progress dialog text periodically to show it's still working
-        progress.setValue((progress.value() + 1))
-    
-    progress.close()
-    
-    # Handle the result
-    if result['error']:
-        # Show error dialog
-        QMessageBox.critical(None, "Submission Error", 
-                           f"Failed to submit data to server:\n{result['error']}")
-        return False
-    
-    if result['success']:
-        # Show success message
-        # QMessageBox.information(None, "Success", 
-        #                       "Analysis complete! Results have been saved and opened in your browser.")
-        print("Analysis complete! Results have been saved and opened in your browser.")
-
-    return result['success']
+def submit_to_server(json_data: Dict):
+    """Wraps the shared simplenmr_builder.gui.submission.submit_to_server
+    with Bruker's server address. Returns a SubmissionResult — real
+    outcome classification (success / diagnostic report / registration
+    required or expired / error), and results open in the shared PyQt
+    viewer rather than the system web browser."""
+    return _shared_submit_to_server(json_data, SERVERADDRESS + "simpleMNOVA")
 
 
 def get_bruker_root_folder_from_identifier(path):
@@ -446,8 +200,8 @@ def hsqc_present(user_selections):
             return True
     return False
 
-# Initialize QApplication for GUIDATA
-_app = guidata.qapplication()
+# Initialize QApplication
+_app = QApplication.instance() or QApplication(sys.argv)
 
 def main():
 
@@ -476,16 +230,16 @@ def main():
     print("\n Registration verified. Starting application...")
     
     # Step 1: Select Bruker data folder
-    folder_dialog = BrukerFolderDialog(title="Select Bruker Data Folder")
-    # set default folder
-    folder_dialog.bruker_folder = str(brukerRootFolder)
-    
-    if not folder_dialog.edit():
+    selected_dir = QFileDialog.getExistingDirectory(
+        None, "Select Bruker Data Folder", str(brukerRootFolder)
+    )
+
+    if not selected_dir:
         print("No folder selected. Exiting.")
         myGUIDATAwarn("No folder selected. Exiting.")
         return
-    
-    bruker_data_dir = Path(folder_dialog.bruker_folder)
+
+    bruker_data_dir = Path(selected_dir)
     print(f"Selected folder: {bruker_data_dir}")
     
     if not bruker_data_dir.exists():
@@ -539,16 +293,28 @@ def main():
 
     # Step 4: Create and show processing dialog
     print("\n4. Experiment Selection Dialog")
-    ProcessingDialog = create_processing_dialog(experiments_with_peaks, converter)
-    dialog_instance = ProcessingDialog()
-    
-    if not dialog_instance.edit():
+    dialog_entries = {}
+    for expt_id, proc_files in experiments_with_peaks.items():
+        expt_data = converter.bruker_data[expt_id]
+        experiment_type = expt_data.get('experimentType', 'Unknown')
+        if experiment_type == "Unknown":
+            continue
+        procnumbers = [proc_file.name for proc_file in proc_files]
+        print(expt_id, procnumbers + ["SKIP"])
+        dialog_entries[expt_id] = {
+            "label": f"{expt_id} {experiment_type}",
+            "procnos": procnumbers,
+        }
+
+    dialog_instance = ProcnoSelectionDialog(dialog_entries)
+
+    if dialog_instance.exec() != ProcnoSelectionDialog.Accepted:
         print("Dialog cancelled. Exiting.")
         return
-    
+
     # Step 5: Process user selections
     print("\n5. Processing User Selections...")
-    user_selections = process_user_selections(dialog_instance, experiments_with_peaks, converter)
+    user_selections = process_user_selections(dialog_instance.get_selections(), converter)
 
     if not user_selections:
         print("No experiments selected for processing.")
@@ -570,8 +336,7 @@ def main():
     # myGUIDATAwarn(f"Selected {len(user_selections)} experiments for processing")
 
     # Get processing options
-    ml_consent = dialog_instance.ml_consent
-    simulated_annealing = dialog_instance.simulated_annealing
+    simulated_annealing, ml_consent = dialog_instance.get_processing_options()
 
     print(f"  - ML consent: {ml_consent}")
     print(f"  - Simulated annealing: {simulated_annealing}")
@@ -579,11 +344,40 @@ def main():
     # Step 6: Convert to JSON
     print("\n6. Converting to JSON...")
     try:
-        json_data = converter.convert_to_json(
-            user_expt_selections=user_selections,
-            ml_consent=ml_consent,
-            simulated_annealing=simulated_annealing
-        )
+        if getattr(converter, "convert_to_json_via_builder", None) is not None:
+            try:
+                json_data = converter.convert_to_json_via_builder(
+                    user_expt_selections=user_selections,
+                    ml_consent=ml_consent,
+                    simulated_annealing=simulated_annealing,
+                )
+            except Exception as builder_exc:
+                # Only ContractError-family exceptions represent a real,
+                # specific reason the submission itself is invalid (missing
+                # required field, no HSQC, unrecognized experiment-type
+                # token). Anything else (e.g. simplenmr_builder not
+                # actually importable despite the attribute existing) falls
+                # back to the original hand-rolled path below rather than
+                # aborting the whole run.
+                from simplenmr_builder import ContractError
+
+                if isinstance(builder_exc, ContractError):
+                    print(f"Error during JSON conversion: {builder_exc}")
+                    myGUIDATAwarn(
+                        f"The data could not be validated for submission:\n\n{builder_exc}"
+                    )
+                    return
+                raise
+        else:
+            print(
+                "WARNING: simplenmr_builder is not available - falling back to the "
+                "original JSON construction with no pre-submission validation."
+            )
+            json_data = converter.convert_to_json(
+                user_expt_selections=user_selections,
+                ml_consent=ml_consent,
+                simulated_annealing=simulated_annealing
+            )
         print("JSON conversion complete")
     except Exception as e:
         print(f"Error during JSON conversion: {e}")
@@ -612,10 +406,38 @@ def main():
 
     # Step 8: Submit to server for analysis
     print("\n7. Submitting to simpleNMR Server...")
-    if submit_to_server(json_data):
-        print("Analysis complete! Check the opened browser window for results.")
+    submission = submit_to_server(json_data)
+
+    if submission.outcome == SubmissionOutcome.SUCCESS:
+        print("Analysis complete! Opening results viewer...")
+        # Launched as a SEPARATE process, not imported in-process -
+        # guidata is gone now (see procno_selection_dialog.py), but
+        # this remains cheap insurance against any future PyQt5
+        # dependency causing the same class of Qt-binding collision.
+        #
+        # wait=True: blocks here until the viewer window is closed,
+        # so this script's own lifetime visibly tracks the viewer's
+        # rather than exiting immediately while a detached process
+        # keeps running. html_viewer.py's __main__ force-exits
+        # cleanly the moment its window closes (see its os._exit()
+        # call), so this returns promptly with no manual Ctrl-C
+        # needed — confirmed 2026-08-27 this combination fixes both
+        # the "program exits while the viewer is still coming up"
+        # and "have to Ctrl-C to actually close it" complaints.
+        open_result_viewer_subprocess(submission, wait=True)
+        return
+    elif submission.outcome == SubmissionOutcome.DIAGNOSTIC_HTML:
+        print(
+            f"Server returned a diagnostic report (status {submission.status_code}). "
+            "Opening it in the viewer..."
+        )
+        open_result_viewer_subprocess(submission, wait=True)
+        return
     else:
-        myGUIDATAwarn("Server submission failed")
+        # submit_to_server() has already shown the appropriate dialog
+        # (network error / server error / registration required or
+        # expired) - nothing further to do here.
+        print(f"Server submission did not succeed: {submission.outcome.value}")
         return
     
 

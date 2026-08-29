@@ -21,6 +21,21 @@ except ImportError:
 from .data_reader import BrukerDataDirectory
 from ..config import EXPERIMENT_CONFIGS
 
+# ── simplenmr_builder integration, added 2026-08-27 ──────────────────────
+# Same shared construction/validation library used by the JEOL converter
+# (simpleNMRjeolTools3). Vendored under src/simplenmr_builder/ (sibling to
+# this package, auto-discovered by the [tool.setuptools.packages.find]
+# src-layout config) so it installs alongside simpleNMRbrukerTools with no
+# extra steps. Import is defensive: if it's somehow missing from an
+# installed environment, convert_to_json() (unchanged) still works with no
+# pre-submission validation, rather than crashing outright.
+try:
+    from simplenmr_builder import SimpleNMRBuilder, ContractError
+
+    _SIMPLENMR_BUILDER_AVAILABLE = True
+except ImportError:
+    _SIMPLENMR_BUILDER_AVAILABLE = False
+
 
 class BrukerToJSONConverter:
     """
@@ -214,9 +229,6 @@ class BrukerToJSONConverter:
         Returns:
             Complete JSON data structure
         """
-
-
-
         # Clear any existing data
         self.json_data = {}
         
@@ -243,6 +255,160 @@ class BrukerToJSONConverter:
         self._add_simulated_annealing(simulated_annealing)
         
         return self.json_data
+
+    def convert_to_json_via_builder(
+        self,
+        user_expt_selections: Dict[str, Dict],
+        ml_consent: bool = False,
+        simulated_annealing: bool = False,
+        validator_path=None,
+    ) -> Dict[str, Any]:
+        """
+        Preferred replacement for convert_to_json(): builds the payload
+        through simplenmr_builder.SimpleNMRBuilder instead of hand-
+        assembling self.json_data field-by-field. Runs the real
+        required-field, no-fallback, schema, and HSQC-presence checks
+        before returning — a bad submission (missing smiles/molfile, no
+        HSQC, an unrecognized experiment-type token) fails immediately
+        with a specific reason, rather than after a round trip to the
+        server, or silently (see _add_nmr_spectra_via_builder's docstring
+        for the specific bug class this closes off).
+
+        Sets self.json_data (same as convert_to_json()) since
+        save_json()/get_json_string() both read that attribute directly,
+        not just the return value.
+        """
+        builder = SimpleNMRBuilder(source="bruker")
+
+        if self.smiles:
+            builder.set_scalar("smiles", self.smiles)
+        if self.molfile_content:
+            builder.set_scalar("molfile", self.molfile_content)
+
+        hostname = hex(uuid.getnode())
+        builder.set_scalar("hostname", hostname)
+        builder.set_scalar(
+            "workingDirectory", str(self.data_directory.absolute()).replace("\\", "/")
+        )
+        builder.set_scalar("workingFilename", self.data_directory.name)
+
+        if RDKIT_AVAILABLE and self.rdkit_mol:
+            all_atoms_env = self._create_all_atoms_info_from_mol()
+            carbon_atoms_env = self._create_carbon_atoms_info_from_mol()
+            builder.set_all_atoms_info(list(all_atoms_env["data"].values()))
+            builder.set_carbon_atoms_info(list(carbon_atoms_env["data"].values()))
+        else:
+            # Matches convert_to_json()'s placeholder behavior: no mol
+            # file / no RDKit means empty, not missing (missing would be
+            # a hard refusal - allAtomsInfo/carbonAtomsInfo have no
+            # server-side fallback).
+            builder.set_all_atoms_info([])
+            builder.set_carbon_atoms_info([])
+
+        # This converter has no NMR-assignment or shift-prediction logic
+        # of its own (unlike JEOL/MNova) - always empty, matching
+        # convert_to_json()'s hardcoded placeholders exactly.
+        builder.set_nmr_assignments([])
+        builder.set_c13predictions([])
+
+        builder.set_scalar("carbonCalcPositionsMethod", "Calculated Positions")
+        builder.set_scalar("MNOVAcalcMethod", "NMRSHIFTDB2 Predict")
+        builder.set_scalar("ml_consent", ml_consent)
+        builder.set_scalar("simulatedAnnealing", simulated_annealing)
+
+        self._add_nmr_spectra_via_builder(builder, user_expt_selections)
+        self._add_spectra_with_peaks_via_builder(builder)
+
+        self.json_data = builder.build(validator_path=validator_path)
+        return self.json_data
+
+    def _add_nmr_spectra_via_builder(
+        self, builder: "SimpleNMRBuilder", user_expt_selections: Dict[str, Dict]
+    ) -> None:
+        """
+        Same experiment-matching and numbering logic as _add_nmr_spectra()
+        (a running per-type count over insertion order), but adds each
+        block through builder.spectra.add_block(exp_type, block) instead
+        of writing directly into self.json_data[spectrum_id].
+
+        add_block() validates exp_type against the canonical
+        NMREXPERIMENTS list before accepting it. The original code had no
+        such check - an experimentType value that wasn't a real
+        NMREXPERIMENTS token (e.g. a typo, or a value from a UI dropdown
+        that drifted out of sync with the server's token list, the exact
+        class of bug found and fixed in simpleNMRjeolTools3) would
+        silently produce a spectrum_id key that never classifies
+        server-side, with no error anywhere. Now it raises a clear
+        ValueError at construction time instead.
+        """
+        experiment_identifiers_seen: List[str] = []
+
+        for expt_id, expt_selection_values in user_expt_selections.items():
+            exp_type = expt_selection_values.get("experimentType", "Unknown")
+            procno = expt_selection_values["procno"]
+
+            if exp_type == "Unknown":
+                continue
+
+            print(f"Processing experiment {expt_id} with type {exp_type}")
+
+            expt_data = self.bruker_data.get(expt_id, {})
+            if not expt_data:
+                print(f"Warning: No data found for experiment {expt_id}")
+                continue
+
+            pulseprogram = expt_data.get("pulseprogram", "unknown")
+            nuclei = expt_data.get("nuclei", ["Unknown"])
+            dimensions = expt_data.get("dimensions", 1)
+
+            # Same numbering scheme as _add_nmr_spectra(): SpectrumBuilder
+            # numbers blocks per-token over insertion order internally too,
+            # so as long as insertion order matches (it does - same loop),
+            # this stays in sync with the key add_block() will assign.
+            exp_type_count = experiment_identifiers_seen.count(exp_type)
+            experiment_identifiers_seen.append(exp_type)
+            spectrum_id = f"{exp_type}_{exp_type_count}"
+
+            spectrum_data = self._create_spectrum_entry(expt_data, spectrum_id, procno)
+            builder.spectra.add_block(exp_type, spectrum_data)
+
+            if dimensions == 1:
+                nucleus_str = nuclei[0] if nuclei else "Unknown"
+            else:
+                nucleus_str = f"[{', '.join(nuclei)}]"
+
+            chosen_entry = f"{nucleus_str} {dimensions}D {pulseprogram} {spectrum_id} {exp_type}"
+            builder.spectra.add_chosen_candidate(chosen_entry, skip=False)
+
+        # exptIdentifiers: ALL raw experiments TopSpin detected, not just
+        # the ones the user chose - "SKIP" here means "auto-classifier
+        # couldn't recognize this," a different meaning from the
+        # user-exclusion SKIP that would appear in chosenSpectra. Never
+        # filtered - add_expt_identifier() doesn't go through skip.py.
+        for expt_id, expt_data in self.bruker_data.items():
+            exp_type = expt_data.get("experimentType", "SKIP")
+            builder.spectra.add_expt_identifier(exp_type)
+
+    def _add_spectra_with_peaks_via_builder(self, builder: "SimpleNMRBuilder") -> None:
+        """Same logic as _add_experiment_settings()'s spectraWithPeaks
+        construction, routed through builder.spectra instead of a local list."""
+        for expt_id, expt_data in self.bruker_data.items():
+            if expt_data.get("haspeaks", False):
+                nuclei = expt_data.get("nuclei", ["Unknown"])
+                dimensions = expt_data.get("dimensions", 1)
+                pulseprogram = expt_data.get("pulseprogram", "unknown")
+                exp_type = expt_data.get("experimentType", "Unknown")
+
+                if dimensions == 1:
+                    nucleus_str = f"{nuclei[0]} 1D"
+                else:
+                    nucleus_str = f"[{', '.join(nuclei)}] {exp_type}"
+
+                spectrum_name = (
+                    f"{nucleus_str} {pulseprogram} {expt_id}."
+                    f"{'fid' if dimensions == 1 else 'ser'}_0"
+                )
+                builder.spectra.add_spectrum_with_peaks(spectrum_name)
     
     def _add_molecular_info(self) -> None:
         """Add SMILES and molfile information to JSON."""
