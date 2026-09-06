@@ -66,6 +66,11 @@ except ImportError as e:
     sys.exit(1)
 
 from simpleNMRbrukerTools.core.json_converter import BrukerToJSONConverter
+from simpleNMRbrukerTools.core.selection_helpers import (
+    find_experiments_with_peaks,
+    process_user_selections,
+    hsqc_present,
+)
 # from simpleNMRbrukerTools.core.data_reader import BrukerDataDirectory  
 # from simpleNMRbrukerTools.config import EXPERIMENT_CONFIGS
 
@@ -76,84 +81,6 @@ def myGUIDATAwarn(message: str, title: str = "Warning") -> None:
     file; only the implementation changed."""
     QMessageBox.warning(None, title, message)
  
-
-
-def find_experiments_with_peaks(converter) -> Dict[str, List]:
-    """
-    Find experiments that have peak data available.
-    
-    Args:
-        converter: BrukerToJSONConverter instance
-        
-    Returns:
-        Dictionary mapping experiment IDs to lists of processing folders with peaks
-    """
-    experiments_with_peaks = {}
-    
-    # Handle both original and refactored data structures
-    if hasattr(converter, 'bruker_data'):
-        # Refactored structure
-        data_dict = converter.bruker_data.data if hasattr(converter.bruker_data, 'data') else converter.bruker_data
-    else:
-        # Original structure
-        data_dict = converter._all_bruker_folders
-    
-    for expt_id, expt_data in data_dict.items():
-        if not expt_data.get('haspeaks', False):
-            continue
-            
-        experiment_type = expt_data.get('experimentType', 'Unknown')
-        if experiment_type == 'Unknown':
-            continue
-        
-        # Find processing folders with peaks
-        pdata = expt_data.get('pdata', {})
-        proc_folders_with_peaks = []
-        
-        # Handle different pdata structures
-        if 'procfolders' in pdata:
-            # Refactored structure
-            for folder in pdata.get('procfolders', []):
-                folder_name = folder.name if hasattr(folder, 'name') else str(folder)
-                proc_data = pdata.get(folder_name, {})
-                
-                if proc_data.get('haspeaks', False):
-                    proc_folders_with_peaks.append(folder)
-        else:
-            # Original structure - check for numbered folders
-            for key, value in pdata.items():
-                if key != 'path' and isinstance(value, dict):
-                    if value.get('haspeaks', False):
-                        proc_folders_with_peaks.append(key)
-        
-        if proc_folders_with_peaks:
-            experiments_with_peaks[expt_id] = proc_folders_with_peaks
-            print(f"Found experiment {expt_id} ({experiment_type}) with {len(proc_folders_with_peaks)} processed datasets")
-    
-    return experiments_with_peaks
-
-
-def process_user_selections(procno_selections: Dict[str, str], converter) -> Dict[str, Dict]:
-    """
-    Combine the dialog's {expt_id: procno} selections with each
-    experiment's known type into the shape convert_to_json_via_builder()
-    expects: {expt_id: {"experimentType": ..., "procno": ...}}.
-
-    Much simpler than the original: ProcnoSelectionDialog.get_selections()
-    already excludes SKIP'd rows and returns the chosen procno directly
-    (no index-into-choices-list lookup needed, unlike the old
-    guidata ChoiceItem, which stored a selected INDEX).
-    """
-    data_dict = converter.bruker_data.data if hasattr(converter.bruker_data, 'data') else converter.bruker_data
-
-    user_selections = {}
-    for expt_id, procno in procno_selections.items():
-        expt_data = data_dict[expt_id]
-        experiment_type = expt_data.get('experimentType', 'Unknown')
-        print(f"User selected: {expt_id} ({experiment_type}) -> {procno}")
-        user_selections[expt_id] = {"experimentType": experiment_type, "procno": procno}
-
-    return user_selections
 
 
 def check_user_registration() -> bool:
@@ -184,21 +111,6 @@ def get_bruker_root_folder_from_identifier(path):
         return Path(*parts[:pdata_index-1])
     
     return None
-
-def hsqc_present(user_selections):
-    """
-    Check if HSQC experiment with peaks is present in user selections.
-    
-    Args:
-        user_selections: List of user-selected experiments
-        
-    Returns:
-        True if HSQC experiment with peaks is present, False otherwise
-    """
-    for expt in user_selections.values():
-        if expt.get('experimentType') == 'HSQC':
-            return True
-    return False
 
 # Initialize QApplication
 _app = QApplication.instance() or QApplication(sys.argv)
